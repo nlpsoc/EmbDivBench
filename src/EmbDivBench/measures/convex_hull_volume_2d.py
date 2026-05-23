@@ -8,7 +8,7 @@ from scipy.spatial import ConvexHull
 
 from .._accepts_text import accepts_text
 
-### Volume-Based Diversity Measure (2D-projected)
+### Geometry-Based Diversity Measure (2D-projected)
 
 
 @accepts_text

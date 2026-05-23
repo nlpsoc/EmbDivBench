@@ -14,10 +14,6 @@ __pycache__/
 .cache
 .python-version
 
-# Sphinx auto-generated documentation files
-docs/source/modules.rst
-docs/source/EmbDivBench*.rst
-
 # ignore tokens
 .env
 .mcp.json

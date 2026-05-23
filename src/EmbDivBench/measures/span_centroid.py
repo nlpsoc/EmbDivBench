@@ -5,7 +5,7 @@ from typing import Any, Sequence
 from .._accepts_text import accepts_text
 from ._types import DISTANCE_METRIC
 
-### Distance-Based Diversity Measure
+### Geometry-Based Diversity Measure
 
 import numpy as np
 from scipy.spatial.distance import cdist

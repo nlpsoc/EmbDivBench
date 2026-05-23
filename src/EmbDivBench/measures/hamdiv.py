@@ -5,7 +5,7 @@ from typing import Any, Literal, Sequence
 from .._accepts_text import accepts_text
 from ._types import DISTANCE_METRIC
 
-### Distance-Based Diversity Measure
+### Graph-Based Diversity Measure
 
 from .utils import _compute_pairwise_distances
 from scipy.spatial.distance import squareform

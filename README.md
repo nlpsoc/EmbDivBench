@@ -4,12 +4,10 @@ This repository accompanies an EMNLP submission on **embedding-based diversity
 measurement for text datasets**. It contains:
 
 1. **`src/EmbDivBench/`** — a Python package that implements 22 diversity
-   measures (distance-, geometry-， distribution- and graph-based)
+   measures (distance-, geometry-, graph-, and distribution-based)
    on top of arbitrary sentence embedding models.
 2. **`data_creation/`** — the scripts that generate the two evaluation
-   tiers used in the paper (with the synthetic simulated data and natural text data from Wikipedia).
-3. **`test/`, `examples/`, `benchmarks/`, `docs/`** — tests, usage notebooks,
-   a caching micro-benchmark, and Sphinx documentation sources.
+   tiers used in the paper (synthetic simulated data and natural text data from Wikipedia).
 
 > Reviewer note: the code is provided so that the measures, the benchmark
 > construction pipeline, and the end-to-end evaluation can be reproduced.
@@ -24,7 +22,6 @@ measurement for text datasets**. It contains:
 - [Installation](#installation)
 - [Available measures](#available-measures)
 - [Reproducing the benchmarks](#reproducing-the-benchmarks)
-- [Running the tests](#running-the-tests)
 - [Repository layout](#repository-layout)
 
 ## Quickstart
@@ -61,9 +58,7 @@ The project uses [uv](https://docs.astral.sh/uv/) for dependency management.
 
 ```bash
 # Clone, then from the repo root:
-uv sync --no-group dev          # standard install
-# or
-uv sync --group dev             # with dev tooling (pytest, notebook, sphinx, ...)
+uv sync
 source .venv/bin/activate
 ```
 
@@ -84,20 +79,21 @@ See the comment block in `pyproject.toml` for details.
 
 ## Available measures
 
-All measures live under `src/EmbDivBench/measures/`. The currently registered
-measures are:
+All 22 measures live under `src/EmbDivBench/measures/` and are grouped into
+four families:
 
-| Category               | Measure(s) |
-|------------------------|------------|
-| Distance-based         | `mean_pw_dist`, `dist_dispersion`, `hamdiv`, `diameter`, `bottleneck`, `sum_bottleneck`, `sum_diameter`, `energy`, `cluster_inertia`, `span_centroid`, `chamfer_dist` |
-| Volume-based           | `convex_hull_volume_2d`, `radius`, `span_medoid` |
-| Distribution-based     | `vendi_score`, `renyi_entropy`, `dcscore`, `log_determinant`, `bins_entropy` |
-| Graph-based            | `graph_entropy`, `mst_dispersion` |
-| Geometry-based (multi) | `mag_areas` |
+| Family       | Measures |
+|--------------|----------|
+| Distance     | `mean_pw_dist`, `dist_dispersion`, `energy`, `chamfer_dist` |
+| Geometry     | `convex_hull_volume_2d`, `span_centroid`, `radius`, `diameter`, `bottleneck`, `span_medoid`, `sum_diameter`, `sum_bottleneck`, `cluster_inertia` |
+| Graph        | `graph_entropy`, `mst_dispersion`, `hamdiv` |
+| Distribution | `vendi_score`, `dcscore`, `renyi_entropy`, `log_determinant`, `bins_entropy`, `mag_areas` |
 
-Each measure is registered via `@accepts_text` in
+Each single-dataset measure is registered via `@accepts_text` in
 `src/EmbDivBench/measures_registry.py`, so they can be invoked uniformly through
-`measure_diversity(...)` or called directly with raw embeddings.
+`measure_diversity(...)` or called directly with raw embeddings. `mag_areas`
+has a multi-dataset API and is exposed as a module-level function rather than
+through the registry.
 
 ## Reproducing the benchmarks
 
@@ -115,22 +111,11 @@ The end-to-end measure evaluation entry point used in the paper is
 `src/EmbDivBench/evaluate_measures.py`; it can also be driven through the
 `EmbDivBench` CLI installed by `pyproject.toml`.
 
-## Running the tests
-
-```bash
-uv sync --group dev
-source .venv/bin/activate
-pytest
-```
-
-Integration tests are marked with the `integration` marker and may require
-network access for downloading embedding models.
-
 ## Repository layout
 
 ```
 .
-├── src/EmbDivBench/          # measures, embedding helpers, CLI, evaluation
+├── src/EmbDivBench/        # measures, embedding helpers, CLI, evaluation
 │   ├── measures/           # each diversity measure as a single module
 │   ├── embeddings/         # SBERT / SimCSE helpers
 │   ├── eval/               # STEL-style style evaluation data + loaders
@@ -142,10 +127,6 @@ network access for downloading embedding models.
 ├── data_creation/
 │   ├── wiki/               # Wikipedia semantic-diversity benchmark scripts
 │   └── synthetic/          # Synthetic GMM benchmark scripts
-├── test/                   # pytest suite
-├── examples/               # usage notebooks and small end-to-end scripts
-├── benchmarks/             # pairwise-distance caching micro-benchmark
-├── docs/                   # Sphinx documentation sources
 ├── pyproject.toml
 ├── uv.lock
 └── LICENSE

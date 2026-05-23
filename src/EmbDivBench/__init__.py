@@ -5,33 +5,31 @@ from __future__ import annotations
 ### Distance-Based Diversity Measures
 from .measures.mean_pw_dist import mean_pw_dist
 from .measures.dist_dispersion import dist_dispersion
-from .measures.hamdiv import hamdiv
-from .measures.diameter import diameter
-from .measures.bottleneck import bottleneck
-from .measures.sum_bottleneck import sum_bottleneck
-from .measures.sum_diameter import sum_diameter
 from .measures.energy import energy
-from .measures.cluster_inertia import cluster_inertia
-from .measures.span_centroid import span_centroid
 from .measures.chamfer_dist import chamfer_dist
 
-### Volume-Based Diversity Measures
+### Geometry-Based Diversity Measures
 from .measures.convex_hull_volume_2d import convex_hull_volume_2d
+from .measures.span_centroid import span_centroid
 from .measures.radius import radius
+from .measures.diameter import diameter
+from .measures.bottleneck import bottleneck
 from .measures.span_medoid import span_medoid
-
-### Distribution-Based Diversity Measures
-from .measures.vendi_score import vendi_score
-from .measures.renyi_entropy import renyi_entropy
-from .measures.dcscore import dcscore
-from .measures.log_determinant import log_determinant
-from .measures.bins_entropy import bins_entropy
+from .measures.sum_diameter import sum_diameter
+from .measures.sum_bottleneck import sum_bottleneck
+from .measures.cluster_inertia import cluster_inertia
 
 ### Graph-Based Diversity Measures
 from .measures.graph_entropy import graph_entropy
 from .measures.mst_dispersion import mst_dispersion
+from .measures.hamdiv import hamdiv
 
-### Geometry-Based Diversity Measures (multi-dataset)
+### Distribution-Based Diversity Measures
+from .measures.vendi_score import vendi_score
+from .measures.dcscore import dcscore
+from .measures.renyi_entropy import renyi_entropy
+from .measures.log_determinant import log_determinant
+from .measures.bins_entropy import bins_entropy
 from .measures.mag_areas import mag_areas
 
 ### Registries
@@ -52,12 +50,12 @@ __all__ = [
     # Main entry point
     "measure_diversity",
     # Individual measures
-    "mean_pw_dist", "dist_dispersion", "hamdiv", "diameter", "bottleneck",
-    "sum_bottleneck", "sum_diameter", "energy", "cluster_inertia", "span_centroid", "chamfer_dist",
-    "convex_hull_volume_2d", "radius", "span_medoid", "vendi_score",
-    "renyi_entropy", "dcscore", "log_determinant", "bins_entropy",
-    "graph_entropy", "mst_dispersion",
-    "mag_areas",
+    "mean_pw_dist", "dist_dispersion", "energy", "chamfer_dist",
+    "convex_hull_volume_2d", "span_centroid", "radius", "diameter", "bottleneck",
+    "span_medoid", "sum_diameter", "sum_bottleneck", "cluster_inertia",
+    "graph_entropy", "mst_dispersion", "hamdiv",
+    "vendi_score", "dcscore", "renyi_entropy", "log_determinant",
+    "bins_entropy", "mag_areas",
     # Helpers
     "embed_texts",
     # Registries

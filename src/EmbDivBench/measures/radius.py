@@ -4,7 +4,7 @@ from typing import Sequence
 
 from .._accepts_text import accepts_text
 
-### Volume-Based Diversity Measure
+### Geometry-Based Diversity Measure
 
 import numpy as np
 

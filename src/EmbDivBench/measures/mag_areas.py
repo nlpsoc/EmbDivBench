@@ -4,7 +4,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
-### Geometry-Based Diversity Measure (multi-dataset)
+### Distribution-Based Diversity Measure (multi-dataset)
 
 
 def _load_magnipy():
