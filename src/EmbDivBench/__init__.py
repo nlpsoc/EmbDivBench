@@ -4,7 +4,7 @@ from __future__ import annotations
 
 ### Distance-Based Diversity Measures
 from .measures.mean_pw_dist import mean_pw_dist
-from .measures.dist_dispersion import dist_dispersion
+from .measures.sum_pw_dist import sum_pw_dist
 from .measures.energy import energy
 from .measures.chamfer_dist import chamfer_dist
 
@@ -50,7 +50,7 @@ __all__ = [
     # Main entry point
     "measure_diversity",
     # Individual measures
-    "mean_pw_dist", "dist_dispersion", "energy", "chamfer_dist",
+    "mean_pw_dist", "sum_pw_dist", "energy", "chamfer_dist",
     "convex_hull_volume_2d", "span_centroid", "radius", "diameter", "bottleneck",
     "span_medoid", "sum_diameter", "sum_bottleneck", "cluster_inertia",
     "graph_entropy", "mst_dispersion", "hamdiv",

@@ -13,7 +13,7 @@ from .utils import _compute_pairwise_distances
 
 
 @accepts_text
-def dist_dispersion(
+def sum_pw_dist(
         data: Sequence[Sequence[float]],
         metric: DISTANCE_METRIC = "cosine",
         **metric_kwargs: Any

@@ -6,7 +6,7 @@ from ._registry import Registry
 
 # Distance-based
 from .measures.mean_pw_dist import mean_pw_dist
-from .measures.dist_dispersion import dist_dispersion
+from .measures.sum_pw_dist import sum_pw_dist
 from .measures.energy import energy
 from .measures.chamfer_dist import chamfer_dist
 
@@ -40,7 +40,7 @@ measures = Registry()
 
 # Distance-based
 measures.register("mean_pw_dist", mean_pw_dist)
-measures.register("dist_dispersion", dist_dispersion)
+measures.register("sum_pw_dist", sum_pw_dist)
 measures.register("energy", energy)
 measures.register("chamfer_dist", chamfer_dist)
 

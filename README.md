@@ -84,7 +84,7 @@ four families:
 
 | Family       | Measures |
 |--------------|----------|
-| Distance     | `mean_pw_dist`, `dist_dispersion`, `energy`, `chamfer_dist` |
+| Distance     | `mean_pw_dist`, `sum_pw_dist`, `energy`, `chamfer_dist` |
 | Geometry     | `convex_hull_volume_2d`, `span_centroid`, `radius`, `diameter`, `bottleneck`, `span_medoid`, `sum_diameter`, `sum_bottleneck`, `cluster_inertia` |
 | Graph        | `graph_entropy`, `mst_dispersion`, `hamdiv` |
 | Distribution | `vendi_score`, `dcscore`, `renyi_entropy`, `log_determinant`, `bins_entropy`, `mag_areas` |
