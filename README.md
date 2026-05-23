@@ -3,12 +3,11 @@
 This repository accompanies an EMNLP submission on **embedding-based diversity
 measurement for text datasets**. It contains:
 
-1. **`src/EmbDivBench/`** — a Python package that implements ~20 diversity
-   measures (distance-, volume-, distribution-, graph-, and geometry-based)
+1. **`src/EmbDivBench/`** — a Python package that implements 22 diversity
+   measures (distance-, geometry-， distribution- and graph-based)
    on top of arbitrary sentence embedding models.
 2. **`data_creation/`** — the scripts that generate the two evaluation
-   benchmarks used in the paper (Wikipedia semantic-diversity benchmark and
-   the synthetic GMM benchmark).
+   tiers used in the paper (with the synthetic simulated data and natural text data from Wikipedia).
 3. **`test/`, `examples/`, `benchmarks/`, `docs/`** — tests, usage notebooks,
    a caching micro-benchmark, and Sphinx documentation sources.
 
