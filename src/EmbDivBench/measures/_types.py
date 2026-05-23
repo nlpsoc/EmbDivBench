@@ -1,4 +1,4 @@
-"""Shared type aliases for embediver."""
+"""Shared type aliases for EmbDivBench."""
 
 from __future__ import annotations
 

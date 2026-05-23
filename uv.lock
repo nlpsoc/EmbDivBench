@@ -653,7 +653,7 @@ wheels = [
 ]
 
 [[package]]
-name = "embediver"
+name = "EmbDivBench"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

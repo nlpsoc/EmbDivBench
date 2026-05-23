@@ -16,7 +16,7 @@ __pycache__/
 
 # Sphinx auto-generated documentation files
 docs/source/modules.rst
-docs/source/embediver*.rst
+docs/source/EmbDivBench*.rst
 
 # ignore tokens
 .env

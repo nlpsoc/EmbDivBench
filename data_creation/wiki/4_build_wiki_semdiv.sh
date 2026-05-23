@@ -15,7 +15,7 @@ source .venv/bin/activate
 export HF_HOME=/PATH/TO/.cache/huggingface
 export TRANSFORMERS_CACHE=/PATH/TO/.cache/huggingface
 
-SCRIPT=/PATH/TO/embediver/data_creation/wiki/build_wiki_semdiv_shuffle.py
+SCRIPT=/PATH/TO/EmbDivBench/data_creation/wiki/build_wiki_semdiv_shuffle.py
 L2_JSON=/PATH/TO/wiki_scraper/metadata/L2/L2_all.json
 OUT_BASE=/PATH/TO/wiki_scraper/output/datasets/labelled/wiki
 EMB_MODEL=/PATH/TO/models/embedding/Qwen3-Embedding-8B

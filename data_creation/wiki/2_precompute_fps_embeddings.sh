@@ -16,7 +16,7 @@ source .venv/bin/activate
 export HF_HOME=/PATH/TO/.cache/huggingface
 export TRANSFORMERS_CACHE=/PATH/TO/.cache/huggingface
 
-SCRIPT=/PATH/TO/embediver/data_creation/wiki/precompute_fps_embeddings.py
+SCRIPT=/PATH/TO/EmbDivBench/data_creation/wiki/precompute_fps_embeddings.py
 L2_JSON=/PATH/TO/wiki_scraper/metadata/L2/L2_all.json
 EMB_MODEL=/PATH/TO/models/embedding/Qwen3-Embedding-8B
 EMB_CACHE=/PATH/TO/wiki_scraper/cache/fps_embeddings

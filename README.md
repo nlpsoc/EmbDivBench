@@ -1,9 +1,9 @@
-# embediver — Code for EMNLP Submission
+# EmbDivBench — Code for EMNLP Submission
 
 This repository accompanies an EMNLP submission on **embedding-based diversity
 measurement for text datasets**. It contains:
 
-1. **`src/embediver/`** — a Python package that implements ~20 diversity
+1. **`src/EmbDivBench/`** — a Python package that implements ~20 diversity
    measures (distance-, volume-, distribution-, graph-, and geometry-based)
    on top of arbitrary sentence embedding models.
 2. **`data_creation/`** — the scripts that generate the two evaluation
@@ -31,7 +31,7 @@ measurement for text datasets**. It contains:
 ## Quickstart
 
 ```python
-from embediver import measure_diversity
+from EmbDivBench import measure_diversity
 
 texts = [
     "The cat sat on the mat.",
@@ -51,7 +51,7 @@ measure_diversity(texts, measure="core")
 measure_diversity(texts, measure=["mean_pw_dist", "diameter"])
 
 # You can also call individual measures directly
-from embediver import log_determinant
+from EmbDivBench import log_determinant
 log_determinant(texts)
 log_determinant(texts, diversity_axis="style")
 ```
@@ -85,7 +85,7 @@ See the comment block in `pyproject.toml` for details.
 
 ## Available measures
 
-All measures live under `src/embediver/measures/`. The currently registered
+All measures live under `src/EmbDivBench/measures/`. The currently registered
 measures are:
 
 | Category               | Measure(s) |
@@ -97,7 +97,7 @@ measures are:
 | Geometry-based (multi) | `mag_areas` |
 
 Each measure is registered via `@accepts_text` in
-`src/embediver/measures_registry.py`, so they can be invoked uniformly through
+`src/EmbDivBench/measures_registry.py`, so they can be invoked uniformly through
 `measure_diversity(...)` or called directly with raw embeddings.
 
 ## Reproducing the benchmarks
@@ -113,8 +113,8 @@ ordering of scripts, required external inputs (e.g. the L2 Wikipedia category
 metadata), and expected outputs.
 
 The end-to-end measure evaluation entry point used in the paper is
-`src/embediver/evaluate_measures.py`; it can also be driven through the
-`embediver` CLI installed by `pyproject.toml`.
+`src/EmbDivBench/evaluate_measures.py`; it can also be driven through the
+`EmbDivBench` CLI installed by `pyproject.toml`.
 
 ## Running the tests
 
@@ -131,7 +131,7 @@ network access for downloading embedding models.
 
 ```
 .
-├── src/embediver/          # measures, embedding helpers, CLI, evaluation
+├── src/EmbDivBench/          # measures, embedding helpers, CLI, evaluation
 │   ├── measures/           # each diversity measure as a single module
 │   ├── embeddings/         # SBERT / SimCSE helpers
 │   ├── eval/               # STEL-style style evaluation data + loaders
@@ -139,7 +139,7 @@ network access for downloading embedding models.
 │   ├── utility/            # caching and project_root helpers
 │   ├── convenience.py      # `measure_diversity(...)` entry point
 │   ├── evaluate_measures.py
-│   └── cli.py              # `embediver` command line interface
+│   └── cli.py              # `EmbDivBench` command line interface
 ├── data_creation/
 │   ├── wiki/               # Wikipedia semantic-diversity benchmark scripts
 │   └── synthetic/          # Synthetic GMM benchmark scripts

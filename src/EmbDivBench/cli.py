@@ -1,4 +1,4 @@
-"""Command-line interface for embediver."""
+"""Command-line interface for EmbDivBench."""
 
 from __future__ import annotations
 
@@ -11,8 +11,8 @@ from typing import Optional
 import typer
 
 app = typer.Typer(
-    name="embediver",
-    help="Measure embedding-based diversity of text data.\n\nRun directly: embediver texts.txt",
+    name="EmbDivBench",
+    help="Measure embedding-based diversity of text data.\n\nRun directly: EmbDivBench texts.txt",
     no_args_is_help=True,
 )
 
@@ -111,7 +111,7 @@ def _run_measure(input_file, measures, axis, model, column, output_format):
         )
     except KeyError as exc:
         # measure_diversity() raises KeyError for unknown measure names
-        typer.echo(f"Error: {exc}. Run 'embediver list-measures' to see available measures.", err=True)
+        typer.echo(f"Error: {exc}. Run 'EmbDivBench list-measures' to see available measures.", err=True)
         raise typer.Exit(code=1)
 
     # ── Output ───────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-"""embediver – embedding-based diversity measures for text and vector data."""
+"""EmbDivBench – embedding-based diversity measures for text and vector data."""
 
 from __future__ import annotations
 

@@ -51,7 +51,7 @@ except ImportError:
 # measure_diversity is a project-local package.
 # Set MEASURE_DIVERSITY_SRC to the path of your project's src/ directory,
 # or ensure it is already on PYTHONPATH.
-MEASURE_DIVERSITY_SRC = "/PATH/TO/embediver/src"  # e.g. "/path/to/Diversity-Measurement/src"
+MEASURE_DIVERSITY_SRC = "/PATH/TO/EmbDivBench/src"  # e.g. "/path/to/Diversity-Measurement/src"
 
 METRICS_AVAILABLE = False
 _metric_import_error = None

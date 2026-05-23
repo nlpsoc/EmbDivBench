@@ -4,8 +4,8 @@
 #SBATCH --time=20:00:00
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=4
-#SBATCH --output=/PATH/TO/embediver/local_misc/other_tests/logs/%x_%j.out
-#SBATCH --error=/PATH/TO/embediver/local_misc/other_tests/logs/%x_%j.err
+#SBATCH --output=/PATH/TO/EmbDivBench/local_misc/other_tests/logs/%x_%j.out
+#SBATCH --error=/PATH/TO/EmbDivBench/local_misc/other_tests/logs/%x_%j.err
 
 
 set -euo pipefail
@@ -25,7 +25,7 @@ echo
 export TOKENIZERS_PARALLELISM=false
 export CUDA_VISIBLE_DEVICES=""
 
-cd /PATH/TO/embediver
+cd /PATH/TO/EmbDivBench
 source .venv/bin/activate
 
 echo "Working dir (after cd): $(pwd)"

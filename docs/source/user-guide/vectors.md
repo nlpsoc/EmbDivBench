@@ -8,7 +8,7 @@ vector representations of non-textual data.
 
 ```python
 import numpy as np
-from embediver import measure_diversity
+from EmbDivBench import measure_diversity
 
 vectors = np.random.randn(100, 384)
 

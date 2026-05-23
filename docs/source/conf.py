@@ -27,7 +27,7 @@ autodoc_mock_imports = [
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'embediver'
+project = 'EmbDivBench'
 copyright = '2026, Anonymous (under review for EMNLP)'
 author = 'Anonymous (under review for EMNLP)'
 

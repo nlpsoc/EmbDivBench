@@ -1,4 +1,4 @@
-# embediver
+# EmbDivBench
 
 ```{include} ../../README.md
 :start-after: <!-- docs-intro-start -->
@@ -36,7 +36,7 @@ user-guide/development-notes
 ```{toctree}
 :maxdepth: 2
 
-embediver
+EmbDivBench
 ```
 
 ## Indices
