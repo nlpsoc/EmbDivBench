@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=61.0"] # Ensure setuptools is at least version 61.0, which supports pyproject.toml
+build-backend = "setuptools.build_meta" # Use setuptools as the build backend
+
+[project]
+name = "embediver"
+version = "0.1.0"
+description = "A package for measuring diversity in text and vector data"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = ["diversity", "nlp", "embeddings", "text-diversity", "metrics"]
+authors = [
+    {name = "Anonymous (under review for EMNLP)"},
+]
+dependencies = [
+    "datasets~=3.3.2",
+    "matplotlib~=3.10.0",
+    "networkx>=2.8.8",
+    "numpy~=2.3.5",
+    "pandas~=2.3.1",
+    "scikit-learn~=1.7.1",
+    "scipy~=1.16.0",
+    "sentence-transformers>=2.7.0",
+    "typer>=0.9.0",
+    "umap-learn>=0.5.9",
+    "vendi-score>=0.0.3",
+]
+
+# Optional extras
+#
+# `magarea` powers the `mag_areas` measure. We keep it OUT of the base
+# dependencies because aidos-lab/magnipy's own pyproject pins
+# scipy==1.13.0, which conflicts with our scipy~=1.16.0. pip/uv cannot
+# express `--no-deps` in package metadata, so we list magnipy's actual
+# runtime libraries by name and require users to install this extra
+# with `--no-deps` so magnipy's stale pins are ignored.
+#
+# Install:
+#     pip install -e ".[magarea]" --no-deps
+# or with uv:
+#     uv pip install -e ".[magarea]" --no-deps
+#
+# The `mag_areas` measure also runtime-shims
+# `scipy.integrate.trapz = trapezoid` (removed in scipy 1.14) so magnipy
+# imports cleanly on our scipy version.
+[project.optional-dependencies]
+magarea = [
+    "magnipy @ git+https://github.com/aidos-lab/magnipy.git@54cb6a2c64f442b339118d6922339231cdb60a82",
+    "numexpr>=2.10",
+    "seaborn>=0.13",
+    "krypy>=2.2",
+]
+
+[project.scripts]
+embediver = "embediver.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[dependency-groups]
+docs = [
+    "sphinx>=8.0.0",
+    "sphinx-rtd-theme>=3.0.0",
+    "sphinx-autodoc-typehints>=3.0.0",
+    "myst-parser>=5.0.0",
+]
+dev = [
+    "datasets~=3.3.2",
+    "notebook>=7.0.0",
+    "matplotlib~=3.10.0",
+    "numpy~=2.3.5",
+    "pandas~=2.3.1",
+    "plotly>=5.0.0",
+    "pytest~=8.4.1",
+    "scikit-learn~=1.7.1",
+    "scipy~=1.16.0",
+    "sentence-transformers>=2.7.0",
+    "sphinx>=8.0.0",
+    "sphinx-rtd-theme>=3.0.0",
+    "sphinx-autodoc-typehints>=3.0.0",
+    "myst-parser>=5.0.0",
+    "umap-learn>=0.5.9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+norecursedirs = ["examples", "build", "dist"]
+pythonpath = ["src"]
+markers = [
+    "integration: marks tests as integration tests (slow, requires internet)"
+]
