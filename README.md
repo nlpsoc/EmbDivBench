@@ -6,15 +6,19 @@ measurement for text datasets**. It contains:
 1. **`src/EmbDivBench/`** — a Python package that implements 22 diversity
    measures (distance-, geometry-, graph-, and distribution-based)
    on top of arbitrary sentence embedding models.
-2. **`data_creation/`** — the scripts that generate the two evaluation
-   tiers used in the paper (synthetic simulated data and natural text data from Wikipedia).
+2. **`datasets/`** — the natural-text benchmarks (5 seeds × {variety,
+   balance, disparity} Wikipedia datasets) used in the paper. See
+   [`datasets/README.md`](datasets/README.md) for the file layout.
+3. **`data_creation/`** — the scripts that build the two evaluation tiers
+   used in the paper (the natural-text Wikipedia benchmark in
+   [`data_creation/wiki/`](data_creation/wiki/), and the synthetic
+   Gaussian-mixture benchmark in [`data_creation/synthetic/`](data_creation/synthetic/)).
 
-> Reviewer note: the code is provided so that the measures, the benchmark
-> construction pipeline, and the end-to-end evaluation can be reproduced.
-> Some scripts under `data_creation/wiki/` contain absolute paths that
-> reflect the authors' compute environment; see the notes in
-> [`data_creation/README.md`](data_creation/README.md) for which arguments
-> to override.
+> The synthetic Gaussian-mixture `.npz` arrays would total ~25 GB and are
+> therefore **not** shipped in this repository. They are deterministic
+> outputs of `data_creation/synthetic/synthetic_umap_vis.py`, which is
+> included so reviewers can regenerate them. See
+> [`datasets/README.md`](datasets/README.md#simulated-data) for the command.
 
 ## Table of Contents
 
@@ -128,9 +132,11 @@ The end-to-end measure evaluation entry point used in the paper is
 │   ├── convenience.py      # `measure_diversity(...)` entry point
 │   ├── evaluate_measures.py
 │   └── cli.py              # `EmbDivBench` command line interface
+├── datasets/
+│   └── natural_text_data/  # bundled Wikipedia benchmarks (5 seeds × 3 axes)
 ├── data_creation/
-│   ├── wiki/               # Wikipedia semantic-diversity benchmark scripts
-│   └── synthetic/          # Synthetic GMM benchmark scripts
+│   ├── wiki/               # Wikipedia benchmark construction scripts + L2 metadata
+│   └── synthetic/          # Synthetic GMM benchmark scripts (data regenerable)
 ├── pyproject.toml
 ├── uv.lock
 └── LICENSE
