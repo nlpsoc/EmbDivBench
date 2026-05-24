@@ -48,9 +48,10 @@ try:
 except ImportError:
     PANDAS_AVAILABLE = False
 
-# EmbDivBench is expected to be installed (e.g. `pip install -e .` from the
-# repo root). The import is attempted lazily so the script can still be used
-# for plotting only (without --run_metrics).
+# The EmbDivBench source tree at src/EmbDivBench/ must be importable
+# (e.g. after `uv sync` or `pip install -e .` from the repo root). The
+# import is attempted lazily so the script can still be used for plotting
+# only (without --run_metrics).
 METRICS_AVAILABLE = False
 _metric_import_error = None
 
@@ -625,9 +626,9 @@ def main():
         _try_import_metrics()
         if not METRICS_AVAILABLE:
             raise ImportError(
-                f"--run_metrics requires the EmbDivBench package. "
-                f"Install it with `pip install -e .` from the repo root. "
-                f"Import failed: {_metric_import_error}"
+                f"--run_metrics requires the EmbDivBench source tree to be "
+                f"importable. Run `uv sync` (or `pip install -e .`) from the "
+                f"repo root first. Import failed: {_metric_import_error}"
             )
 
     if args.no_plots:

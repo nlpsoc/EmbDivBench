@@ -3,9 +3,9 @@
 This repository accompanies an EMNLP submission on **embedding-based diversity
 measurement for text datasets**. It contains:
 
-1. **`src/EmbDivBench/`** — a Python package that implements 22 diversity
+1. **`src/EmbDivBench/`** — reference implementations of the 22 diversity
    measures (distance-, geometry-, graph-, and distribution-based)
-   on top of arbitrary sentence embedding models.
+   evaluated in the paper, operating on arbitrary sentence-embedding models.
 2. **`datasets/`** — the natural-text benchmarks (5 seeds × {variety,
    balance, disparity} Wikipedia datasets) used in the paper. See
    [`datasets/README.md`](datasets/README.md) for the file layout.
@@ -56,25 +56,25 @@ log_determinant(texts)
 log_determinant(texts, diversity_axis="style")
 ```
 
-## Installation
+## Setup
 
-The project uses [uv](https://docs.astral.sh/uv/) for dependency management.
+Dependencies are managed with [uv](https://docs.astral.sh/uv/). From the
+repo root:
 
 ```bash
-# Clone, then from the repo root:
 uv sync
 source .venv/bin/activate
 ```
 
-A plain `pip install -e .` also works if you prefer not to use `uv`; all
-runtime dependencies are listed in `pyproject.toml`.
+(Or `pip install -e .` if you prefer pip; `pyproject.toml` lists all
+runtime dependencies and `requires-python = ">=3.11"`.)
 
 ### Optional: `mag_areas`
 
-The `mag_areas` measure depends on
+The `mag_areas` measure relies on
 [`aidos-lab/magnipy`](https://github.com/aidos-lab/magnipy), which pins
-`scipy==1.13.0` and therefore conflicts with the project's `scipy>=1.16.0`.
-Install it manually after `uv sync`:
+`scipy==1.13.0` and therefore conflicts with the `scipy>=1.16.0` used by
+the rest of the code. Add it manually after `uv sync`:
 
 ```bash
 pip install --no-deps "magnipy @ git+https://github.com/aidos-lab/magnipy.git@54cb6a2c64f442b339118d6922339231cdb60a82"
@@ -82,8 +82,8 @@ pip install numexpr seaborn krypy
 ```
 
 At runtime `mag_areas` shims `scipy.integrate.trapz = trapezoid` (removed
-in scipy 1.14) so magnipy imports cleanly on our scipy version. All other
-measures work without this step.
+in scipy 1.14) so magnipy imports cleanly on the project's scipy version.
+All other measures work without this step.
 
 ## Available measures
 
@@ -97,11 +97,12 @@ four families:
 | Graph        | `graph_entropy`, `mst_dispersion`, `hamdiv` |
 | Distribution | `vendi_score`, `dcscore`, `renyi_entropy`, `log_determinant`, `bins_entropy`, `mag_areas` |
 
-Each single-dataset measure is registered via `@accepts_text` in
-`src/EmbDivBench/measures_registry.py`, so they can be invoked uniformly through
-`measure_diversity(...)` or called directly with raw embeddings. `mag_areas`
-has a multi-dataset API and is exposed as a module-level function rather than
-through the registry.
+Each single-dataset measure is decorated with `@accepts_text` and
+registered in `src/EmbDivBench/measures_registry.py`, so it can be invoked
+uniformly through `measure_diversity(...)` or called directly with raw
+embeddings. `mag_areas` takes a list of datasets rather than a single
+dataset and is exposed as a top-level function instead of through the
+registry.
 
 ## Reproducing the benchmarks
 
@@ -115,23 +116,23 @@ See [`data_creation/README.md`](data_creation/README.md) for the exact
 ordering of scripts, required external inputs (e.g. the L2 Wikipedia category
 metadata), and expected outputs.
 
-The end-to-end measure evaluation entry point used in the paper is
-`src/EmbDivBench/evaluate_measures.py`; it can also be driven through the
-`EmbDivBench` CLI installed by `pyproject.toml`.
+The end-to-end measure evaluation used in the paper lives at
+`src/EmbDivBench/evaluate_measures.py`. The same functionality is reachable
+from a command-line wrapper (`EmbDivBench --help` after `uv sync`).
 
 ## Repository layout
 
 ```
 .
-├── src/EmbDivBench/        # measures, embedding helpers, CLI, evaluation
-│   ├── measures/           # each diversity measure as a single module
+├── src/EmbDivBench/        # measure implementations + embedding / eval / CLI code
+│   ├── measures/           # one module per diversity measure
 │   ├── embeddings/         # SBERT / SimCSE helpers
 │   ├── eval/               # STEL-style style evaluation data + loaders
 │   ├── plot/               # plotting helpers used in the paper
 │   ├── utility/            # caching and project_root helpers
 │   ├── convenience.py      # `measure_diversity(...)` entry point
 │   ├── evaluate_measures.py
-│   └── cli.py              # `EmbDivBench` command line interface
+│   └── cli.py              # command-line wrapper
 ├── datasets/
 │   └── natural_text_data/  # bundled Wikipedia benchmarks (5 seeds × 3 axes)
 ├── data_creation/
