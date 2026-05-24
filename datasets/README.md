@@ -1,10 +1,11 @@
 # Datasets
 
-This directory ships the **natural-text** benchmarks used in the paper.
-Each file contains 10 000 Wikipedia sentence extracts drawn from a
-controlled distribution of topics.
+This directory ships the **natural-text tier** used in the paper. Each
+file contains 10 000 Wikipedia sentence extracts drawn from a controlled
+distribution of topics. The simulated tier is not shipped (see below);
+its `.npz` arrays are regenerable from a script.
 
-## Natural-text data (`natural_text_data/`)
+## Natural-text tier (`natural_text_data/`)
 
 Built by `data_creation/wiki/4_build_wiki_semdiv_shuffle.py` — see
 [`../data_creation/README.md`](../data_creation/README.md) for the
@@ -38,9 +39,9 @@ Three diversity axes are evaluated with aligned constructions:
 Each axis × condition combination is provided across 5 random seeds
 (42–46) for variance estimation.
 
-## Simulated data
+## Simulated tier
 
-The synthetic Gaussian-mixture datasets used in the paper are **not
+The simulated Gaussian-mixture datasets used in the paper are **not
 shipped** because the `.npz` arrays total ~25 GB across all `(dim, seed,
 condition)` combinations and exceed practical repository size limits.
 

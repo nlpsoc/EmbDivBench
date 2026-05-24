@@ -6,19 +6,19 @@ measurement for text datasets**. It contains:
 1. **`src/EmbDivBench/`** — reference implementations of the 22 diversity
    measures (distance-, geometry-, graph-, and distribution-based)
    evaluated in the paper, operating on arbitrary sentence-embedding models.
-2. **`datasets/`** — the natural-text benchmarks (5 seeds × {variety,
+2. **`datasets/`** — the natural-text tier (5 seeds × {variety,
    balance, disparity} Wikipedia datasets) used in the paper. See
    [`datasets/README.md`](datasets/README.md) for the file layout.
 3. **`data_creation/`** — the scripts that build the two evaluation tiers
-   used in the paper (the natural-text Wikipedia benchmark in
-   [`data_creation/wiki/`](data_creation/wiki/), and the synthetic
-   Gaussian-mixture benchmark in [`data_creation/synthetic/`](data_creation/synthetic/)).
+   used in the paper (the natural-text tier in
+   [`data_creation/wiki/`](data_creation/wiki/), and the simulated tier
+    in [`data_creation/synthetic/`](data_creation/synthetic/)).
 
-> The synthetic Gaussian-mixture `.npz` arrays would total ~25 GB and are
+> The simulated data `.npz` arrays would total ~25 GB and are
 > therefore **not** shipped in this repository. They are deterministic
 > outputs of `data_creation/synthetic/synthetic_umap_vis.py`, which is
 > included so reviewers can regenerate them. See
-> [`datasets/README.md`](datasets/README.md#simulated-data) for the command.
+> [`datasets/README.md`](datasets/README.md#simulated-tier) for the command.
 
 ## Table of Contents
 
@@ -39,12 +39,12 @@ texts = [
     "It was a sunny afternoon.",
 ]
 
-# Default measure (log_determinant), semantic embeddings
+# Default: graph_entropy on top of the semantic axis (all-mpnet-base-v2)
 measure_diversity(texts)
 # Use a different diversity axis
 measure_diversity(texts, diversity_axis="style")
 # Use a specific embedding model
-measure_diversity(texts, embedding_model="Qwen/Qwen3-8B")
+measure_diversity(texts, embedding_model="all-MiniLM-L6-v2")
 # Run the core set of measures
 measure_diversity(texts, measure="core")
 # Run specific measures
@@ -104,13 +104,25 @@ embeddings. `mag_areas` takes a list of datasets rather than a single
 dataset and is exposed as a top-level function instead of through the
 registry.
 
+**Defaults** (when no keyword is passed):
+
+| | Value |
+|---|---|
+| `diversity_axis` | `"semantic"` |
+| `embedding_model` | `sentence-transformers/all-mpnet-base-v2` |
+| Single measure | `graph_entropy` |
+| `measure="core"` set | `graph_entropy`, `log_determinant`, `mean_pw_dist`, `vendi_score`, `convex_hull_volume_2d`, `energy` (one representative per family) |
+
+The `"style"` axis uses `AnnaWegmann/Style-Embedding` by default; both
+axis defaults are registered in `src/EmbDivBench/axes_registry.py`.
+
 ## Reproducing the benchmarks
 
-The two evaluation benchmarks from the paper are constructed by the scripts
+The two evaluation tiers from the paper are constructed by the scripts
 under `data_creation/`:
 
-- **Wikipedia semantic-diversity benchmark** — `data_creation/wiki/`
-- **Synthetic GMM benchmark** — `data_creation/synthetic/`
+- **Natural-text tier** (Wikipedia data) — `data_creation/wiki/`
+- **Simulated tier** (Gaussian-mixture data) — `data_creation/synthetic/`
 
 See [`data_creation/README.md`](data_creation/README.md) for the exact
 ordering of scripts, required external inputs (e.g. the L2 Wikipedia category
@@ -134,10 +146,10 @@ from a command-line wrapper (`EmbDivBench --help` after `uv sync`).
 │   ├── evaluate_measures.py
 │   └── cli.py              # command-line wrapper
 ├── datasets/
-│   └── natural_text_data/  # bundled Wikipedia benchmarks (5 seeds × 3 axes)
+│   └── natural_text_data/  # natural-text tier (5 seeds × 3 axes, Wikipedia)
 ├── data_creation/
-│   ├── wiki/               # Wikipedia benchmark construction scripts + L2 metadata
-│   └── synthetic/          # Synthetic GMM benchmark scripts (data regenerable)
+│   ├── wiki/               # natural-text tier construction scripts + L2 metadata
+│   └── synthetic/          # simulated tier construction scripts (data regenerable)
 ├── pyproject.toml
 ├── uv.lock
 └── LICENSE

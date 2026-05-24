@@ -68,7 +68,7 @@ measures.register("log_determinant", log_determinant)
 measures.register("bins_entropy", bins_entropy)
 
 # The single default measure
-DEFAULT_MEASURE = "log_determinant"
+DEFAULT_MEASURE = "graph_entropy"
 
 # Curated representative set across categories
 CORE_MEASURES: list[str] = [

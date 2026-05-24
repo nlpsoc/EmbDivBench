@@ -1,23 +1,23 @@
 # Benchmark construction
 
 This directory contains the two pipelines used to build the evaluation
-benchmarks reported in the paper:
+tiers reported in the paper:
 
-- **`wiki/`** — Wikipedia semantic-diversity benchmark. Builds aligned
+- **`wiki/`** — natural-text tier (Wikipedia data). Builds aligned
   variety / balance / disparity datasets by running farthest-point sampling
   (FPS) over Qwen3-Embedding-8B representations of Wikipedia L1/L2 category
   labels.
-- **`synthetic/`** — Synthetic Gaussian-mixture benchmark plus 3D UMAP
+- **`synthetic/`** — simulated tier (Gaussian-mixture data) plus 3D UMAP
   visualisation and metric evaluation on a controlled set of variety,
   balance, and disparity factors.
 
-Both pipelines are runnable on a single machine; the Wikipedia pipeline
+Both pipelines are runnable on a single machine; the natural-text pipeline
 requires GPU only for step 2 (embedding precomputation). Once the embedding
 cache exists, every later step runs on CPU.
 
 ---
 
-## Wikipedia semantic-diversity benchmark
+## Natural-text tier (Wikipedia data)
 
 Pipeline (run in numerical order):
 
@@ -67,11 +67,14 @@ appropriate `--*` flags.
 `4_build_wiki_semdiv_shuffle.py` writes JSON datasets for variety
 (`k = 10/20/30/40/50`), balance (50 topics, varying skew), and disparity
 (`m = 10/20/30/40/50` supporting L1 categories) — 5 seeds per condition.
-The default output root is `wiki/output/datasets/wiki/`.
+The default output root is `wiki/output/datasets/wiki/`. The same 5-seed
+output is also pre-built and bundled at
+[`../datasets/natural_text_data/`](../datasets/natural_text_data/), so
+reviewers can skip this step entirely.
 
 ---
 
-## Synthetic GMM benchmark
+## Simulated tier (Gaussian-mixture data)
 
 ```bash
 bash synthetic/synthetic_umap_vis.sh
@@ -104,8 +107,8 @@ can also be submitted via `sbatch`.
 
 ## Reproducibility notes
 
-- Both pipelines are seeded; the Wikipedia pipeline reports across 5 seeds
-  and the synthetic pipeline sweeps `(dim, seed)` combinations.
+- Both pipelines are seeded; the natural-text pipeline reports across 5
+  seeds and the simulated pipeline sweeps `(dim, seed)` combinations.
 - The `.sh` wrappers resolve all paths relative to their own location and
   pull configurable values from environment variables (`EMB_MODEL`,
   `EMB_CACHE`, `OUT_BASE`, …). The original SLURM headers are kept so the
