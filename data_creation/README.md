@@ -32,34 +32,42 @@ Pipeline (run in numerical order):
 authors' run of step 3, kept here as a reference for what step 3 should
 produce.
 
-### External inputs required
+### Inputs
 
-Step 2 expects a Wikipedia category metadata file (`L2_all.json`) and a local
-copy of the Qwen3-Embedding-8B model. Both are passed as CLI arguments — the
-sample `.sh` scripts contain the absolute paths used by the authors:
+The Wikipedia category metadata needed by the pipeline ships with the repo:
+
+- `wiki/metadata/L2/L2_all.json` (3.0 MB, 11 554 L2 records) — the catalog
+  of L1/L2 Wikipedia categories with `topic_label`, `category_title`,
+  `direct_pages`, `parent_L1`, etc. produced by a separate scraping pass.
+- `wiki/metadata/L2/viable_l1_min30_min5.txt` — pre-filtered list of L1
+  categories used by step 3.
+
+The only external resources you need are:
+
+1. `Qwen/Qwen3-Embedding-8B` from Hugging Face (fetched automatically on
+   first use; pass a local model path via `--model_path` if you have one
+   already downloaded).
+2. Network access for the live Wikipedia article fetch in step 4.
+
+The `.sh` wrappers resolve every path relative to the script location, so
+you can run them from any working directory:
 
 ```bash
-python3 wiki/2_precompute_fps_embeddings.py \
-    --l2_json /path/to/L2_all.json \
-    --min_direct_pages 30 \
-    --model_path /path/to/Qwen3-Embedding-8B \
-    --cache_dir /path/to/cache/fps_embeddings \
-    --device cuda --batch_size 32
+bash wiki/2_precompute_fps_embeddings.sh    # GPU step
+bash wiki/3_fps_l1_selection_check.sh       # diagnostic
+bash wiki/4_build_wiki_semdiv.sh            # main build, CPU
 ```
 
-Reviewers reproducing the pipeline should:
-
-1. Obtain `L2_all.json` (the scraped Wikipedia category metadata). The
-   scraper used to produce this file is not included in this repository.
-2. Download `Qwen3-Embedding-8B` from Hugging Face.
-3. Replace the `/hpc/...` paths in the `.sh` wrappers with their own paths,
-   or invoke the `.py` scripts directly with the appropriate `--*` flags.
+You can override `EMB_MODEL`, `EMB_CACHE`, `OUT_BASE` via environment
+variables, or invoke the underlying `.py` files directly with the
+appropriate `--*` flags.
 
 ### Output
 
 `4_build_wiki_semdiv_shuffle.py` writes JSON datasets for variety
 (`k = 10/20/30/40/50`), balance (50 topics, varying skew), and disparity
 (`m = 10/20/30/40/50` supporting L1 categories) — 5 seeds per condition.
+The default output root is `wiki/output/datasets/wiki/`.
 
 ---
 
@@ -94,9 +102,11 @@ paths — feel free to ignore it if you are running locally).
 
 - Both pipelines are seeded; the Wikipedia pipeline reports across 5 seeds
   and the synthetic pipeline sweeps `(dim, seed)` combinations.
-- Hardcoded `/hpc/...` paths in the `.sh` wrappers reflect the authors'
-  compute environment. Replace them or call the underlying `.py` scripts
-  directly with your own paths.
+- The `.sh` wrappers resolve all paths relative to their own location and
+  pull configurable values from environment variables (`EMB_MODEL`,
+  `EMB_CACHE`, `OUT_BASE`, …). The original SLURM headers are kept so the
+  wrappers can also be submitted via `sbatch`; under plain `bash` they are
+  ignored.
 - The pipelines do **not** ship the raw Wikipedia article corpus; only the
-  category metadata + label embeddings are needed at build time, and the
-  scripts fetch article text on demand from the configured Wikipedia source.
+  category metadata + label embeddings are needed at build time, and step 4
+  fetches article text on demand from Wikipedia via `wikipediaapi`.

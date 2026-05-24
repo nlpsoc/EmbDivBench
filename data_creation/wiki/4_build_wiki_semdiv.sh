@@ -1,30 +1,34 @@
 #!/bin/bash
+# Step 4 of the Wikipedia semantic-diversity pipeline.
+# Builds variety / balance / disparity datasets across 5 seeds. CPU only
+# after step 2 has populated the FPS embedding cache; if that cache is
+# empty, the first seed below recomputes ~2k label embeddings on CPU
+# (~30-60 min). Article text itself is fetched live from Wikipedia.
+#
+# Run from any cwd:
+#   bash data_creation/wiki/4_build_wiki_semdiv.sh
+# or under SLURM:
+#   sbatch data_creation/wiki/4_build_wiki_semdiv.sh
+
 #SBATCH --job-name=build_wiki_semdiv
 #SBATCH --partition=cpu
 #SBATCH --time=30:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=6
-#SBATCH --output=/PATH/TO/wiki_scraper/logs/%x_%j.out
-#SBATCH --error=/PATH/TO/wiki_scraper/logs/%x_%j.err
+#SBATCH --output=logs/%x_%j.out
+#SBATCH --error=logs/%x_%j.err
 
 set -euo pipefail
 
-cd /PATH/TO/wiki_scraper
-source .venv/bin/activate
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-export HF_HOME=/PATH/TO/.cache/huggingface
-export TRANSFORMERS_CACHE=/PATH/TO/.cache/huggingface
+SCRIPT="${SCRIPT_DIR}/4_build_wiki_semdiv_shuffle.py"
+L2_JSON="${SCRIPT_DIR}/metadata/L2/L2_all.json"
+OUT_BASE="${OUT_BASE:-${SCRIPT_DIR}/output/datasets/wiki}"
+EMB_MODEL="${EMB_MODEL:-Qwen/Qwen3-Embedding-8B}"
+EMB_CACHE="${EMB_CACHE:-${SCRIPT_DIR}/cache/fps_embeddings}"
 
-SCRIPT=/PATH/TO/EmbDivBench/data_creation/wiki/build_wiki_semdiv_shuffle.py
-L2_JSON=/PATH/TO/wiki_scraper/metadata/L2/L2_all.json
-OUT_BASE=/PATH/TO/wiki_scraper/output/datasets/labelled/wiki
-EMB_MODEL=/PATH/TO/models/embedding/Qwen3-Embedding-8B
-EMB_CACHE=/PATH/TO/wiki_scraper/cache/fps_embeddings
-
-# NOTE: If you haven't precomputed the FPS embeddings on GPU yet, the first
-# seed below will compute them on CPU (~30-60 min for ~2000 labels). To avoid
-# this, run `precompute_fps_embeddings.sbatch` once on GPU first; it populates
-# ${EMB_CACHE}, after which every seed below skips embedding entirely.
+mkdir -p "${OUT_BASE}" "${EMB_CACHE}" "${SCRIPT_DIR}/logs"
 
 for SEED in 42 43 44 45 46; do
   echo "========== seed=${SEED} =========="
@@ -50,5 +54,4 @@ for SEED in 42 43 44 45 46; do
     --embedding_model_path "${EMB_MODEL}" \
     --embedding_cache_dir "${EMB_CACHE}" \
     --embedding_batch_size 8
-
 done
