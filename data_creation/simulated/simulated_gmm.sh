@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build the simulated (Gaussian-mixture) tier and evaluate diversity metrics.
+# Build the simulated (Gaussian-mixture) tier and evaluate diversity measures.
 # No GPU required.
 #
 # Run from any cwd:
@@ -7,7 +7,7 @@
 # or under SLURM:
 #   sbatch data_creation/simulated/simulated_gmm.sh
 
-#SBATCH --job-name=simulated-gmm-metrics
+#SBATCH --job-name=simulated-gmm-measures
 #SBATCH --partition=cpu
 #SBATCH --time=20:00:00
 #SBATCH --mem=32G
@@ -31,7 +31,7 @@ START_TIME=$(date +%s)
 python -u "${SCRIPT_DIR}/simulated_gmm.py" \
   --output_dir "${OUT_DIR}" \
   --save_datasets \
-  --run_metrics
+  --run_measures
 
 END_TIME=$(date +%s)
 RUNTIME=$((END_TIME - START_TIME))

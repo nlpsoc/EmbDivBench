@@ -8,7 +8,7 @@ tiers reported in the paper:
   (FPS) over Qwen3-Embedding-8B representations of Wikipedia L1/L2 category
   labels.
 - **`simulated/`** — simulated tier (Gaussian-mixture data) plus diversity
-  metric evaluation on a controlled set of variety, balance, and disparity
+  measure evaluation on a controlled set of variety, balance, and disparity
   factors.
 
 Both pipelines are runnable on a single machine; the natural-text pipeline
@@ -87,7 +87,7 @@ or, with finer control:
 python simulated/simulated_gmm.py \
     --output_dir ./simulated_output \
     --save_datasets \
-    --run_metrics
+    --run_measures
 ```
 
 No GPU required. The script:
@@ -95,7 +95,7 @@ No GPU required. The script:
 - generates Gaussian-mixture datasets across five balance regimes (uniform,
   slight head 20/40, mild head 20/60, Zipfian, strong top-1 50%);
 - writes the raw datasets as `.npz` when `--save_datasets` is passed;
-- evaluates every registered diversity measure (when `--run_metrics` is
+- evaluates every registered diversity measure (when `--run_measures` is
   passed) and emits per-seed Spearman-ρ summary CSVs.
 
 Like the natural-text wrappers, `simulated/simulated_gmm.sh` resolves all

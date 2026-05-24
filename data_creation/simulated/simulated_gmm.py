@@ -1,8 +1,8 @@
 """
-Generate the simulated (Gaussian-mixture) tier and evaluate diversity metrics.
+Generate the simulated (Gaussian-mixture) tier and evaluate diversity measures.
 
 Usage:
-    python simulated_gmm.py [--output_dir OUTPUT_DIR] [--save_datasets] [--run_metrics]
+    python simulated_gmm.py [--output_dir OUTPUT_DIR] [--save_datasets] [--run_measures]
 
 No GPU needed.
 
@@ -11,12 +11,12 @@ Dependencies (already pulled in by ``uv sync`` / ``pip install -e .``):
 
 Output:
     - .npz files (with --save_datasets): compressed (X, y) per dataset
-    - CSV files (with --run_metrics):
-        metrics_dim{d}_seed{s}.csv  -- per-dataset metric values
-        metrics_all.csv             -- combined across all (dim, seed)
+    - CSV files (with --run_measures):
+        measures_dim{d}_seed{s}.csv  -- per-dataset measure values
+        measures_all.csv             -- combined across all (dim, seed)
         spearman_dim{d}_seed{s}.csv -- per-seed Spearman rho
         spearman_per_seed.csv       -- all seeds combined
-        spearman_summary.csv        -- aggregated mean/std/pass_rate per (axis, dim, metric)
+        spearman_summary.csv        -- aggregated mean/std/pass_rate per (axis, dim, measure)
 
 Balance conditions (5 levels, ordered from most to least uniform):
     uniform                 - Datapoints evenly distributed across all topics
@@ -35,8 +35,8 @@ from time import perf_counter
 import numpy as np
 
 # ──────────────────────────────────────────────────────────
-# Optional imports (metrics, pandas, scipy)
-# These are only needed when --run_metrics is passed.
+# Optional imports (measures, pandas, scipy)
+# These are only needed when --run_measures is passed.
 # ──────────────────────────────────────────────────────────
 
 try:
@@ -49,13 +49,13 @@ except ImportError:
 # The EmbDivBench source tree at src/EmbDivBench/ must be importable
 # (e.g. after `uv sync` or `pip install -e .` from the repo root). The
 # import is attempted lazily so the script can still be used for plotting
-# only (without --run_metrics).
-METRICS_AVAILABLE = False
-_metric_import_error = None
+# only (without --run_measures).
+MEASURES_AVAILABLE = False
+_measure_import_error = None
 
 
-def _try_import_metrics():
-    global METRICS_AVAILABLE, _metric_import_error
+def _try_import_measures():
+    global MEASURES_AVAILABLE, _measure_import_error
     try:
         from EmbDivBench import (  # noqa: F401
             mean_pw_dist, sum_pw_dist, cluster_inertia,
@@ -64,10 +64,10 @@ def _try_import_metrics():
             vendi_score, dcscore, log_determinant, sum_diameter,
             mst_dispersion, bins_entropy, renyi_entropy, hamdiv,
         )
-        METRICS_AVAILABLE = True
+        MEASURES_AVAILABLE = True
     except ImportError as e:
-        _metric_import_error = str(e)
-        METRICS_AVAILABLE = False
+        _measure_import_error = str(e)
+        MEASURES_AVAILABLE = False
 
 
 # ──────────────────────────────────────────────────────────
@@ -336,7 +336,7 @@ def make_disparity_dataset(cfg, k_fixed, disparity_m, seed):
 
 
 # ──────────────────────────────────────────────────────────
-# 2. Metric computation
+# 2. Measure computation
 # ──────────────────────────────────────────────────────────
 
 def reduce_to_2d(embs):
@@ -362,9 +362,9 @@ def convex_hull_volume_2d(two_d):
         return None
 
 
-def compute_all_metrics(X, two_d):
+def compute_all_measures(X, two_d):
     """
-    Compute all 22 diversity metrics on one dataset.
+    Compute all 22 diversity measures on one dataset.
 
     Parameters
     ----------
@@ -373,8 +373,8 @@ def compute_all_metrics(X, two_d):
 
     Returns
     -------
-    metrics      : dict[str, float | None]
-    metric_costs : dict[str, float]  -- wall-clock seconds per metric
+    measure_values      : dict[str, float | None]
+    measure_costs : dict[str, float]  -- wall-clock seconds per measure
     """
     from EmbDivBench import (
         mean_pw_dist, sum_pw_dist, cluster_inertia,
@@ -385,10 +385,10 @@ def compute_all_metrics(X, two_d):
     )
 
     data = X.tolist()
-    metric_costs = {}
-    metrics = {}
+    measure_costs = {}
+    measure_values = {}
 
-    metric_jobs = [
+    measure_jobs = [
         ("mean_pw_dist",     lambda: float(mean_pw_dist(data))),
         ("sum_pw_dist",        lambda: float(sum_pw_dist(data))),
         ("cluster_inertia",  lambda: float(cluster_inertia(data))),
@@ -413,23 +413,23 @@ def compute_all_metrics(X, two_d):
         ("hamdiv",                     lambda: float(hamdiv(data))),
     ]
 
-    for metric_name, fn in metric_jobs:
+    for measure_name, fn in measure_jobs:
         t0 = perf_counter()
         try:
             value = fn()
         except Exception as e:
-            metrics[f"{metric_name}_error"] = str(e)
+            measure_values[f"{measure_name}_error"] = str(e)
             value = None
-        metric_costs[metric_name] = float(perf_counter() - t0)
-        metrics[metric_name] = value
+        measure_costs[measure_name] = float(perf_counter() - t0)
+        measure_values[measure_name] = value
 
-    metrics["n_samples"] = int(X.shape[0])
-    metrics["dim"] = int(X.shape[1])
-    metrics["metric_runtime_total_seconds"] = float(sum(metric_costs.values()))
-    return metrics, metric_costs
+    measure_values["n_samples"] = int(X.shape[0])
+    measure_values["dim"] = int(X.shape[1])
+    measure_values["measure_runtime_total_seconds"] = float(sum(measure_costs.values()))
+    return measure_values, measure_costs
 
 
-METRIC_COLS = [
+MEASURE_COLS = [
     "mean_pw_dist", "sum_pw_dist", "cluster_inertia",
     "radius", "chamfer_dist", "convex_hull_volume_2d",
     "span_centroid", "span_medoid", "diameter", "sum_diameter",
@@ -440,22 +440,22 @@ METRIC_COLS = [
 ]
 
 
-def run_metrics_on_group(datasets):
+def run_measures_on_group(datasets):
     """
-    Run all metrics on a list of (X, y, meta) tuples.
+    Run all measures on a list of (X, y, meta) tuples.
     Returns a list of row dicts suitable for pd.DataFrame.
     """
     rows = []
     for i, (X, y, meta) in enumerate(datasets):
         two_d = reduce_to_2d(X)
-        metrics, metric_costs = compute_all_metrics(X, two_d)
+        measure_values, measure_costs = compute_all_measures(X, two_d)
         row = {}
         row.update(meta)
-        row.update(metrics)
-        row["metric_costs_json"] = json.dumps(metric_costs)
+        row.update(measure_values)
+        row["metric_costs_json"] = json.dumps(measure_costs)
         rows.append(row)
         if (i + 1) % 5 == 0:
-            print(f"    metrics progress: {i + 1}/{len(datasets)}")
+            print(f"    measures progress: {i + 1}/{len(datasets)}")
     return rows
 
 
@@ -471,28 +471,28 @@ EXPECT_POSITIVE = {"variety": True, "balance": True, "disparity": True}
 
 
 def spearman_by_seed(df_wide):
-    """Compute per-(axis, dim, seed, metric) Spearman rho between level and metric value."""
+    """Compute per-(axis, dim, seed, measure) Spearman rho between level and measure value."""
     id_cols = ["axis", "level", "seed", "dim"]
     df_long = df_wide.melt(
         id_vars=id_cols,
-        value_vars=[c for c in METRIC_COLS if c in df_wide.columns],
-        var_name="metric",
+        value_vars=[c for c in MEASURE_COLS if c in df_wide.columns],
+        var_name="measure",
         value_name="value",
     ).dropna(subset=["value"])
 
     out = []
-    for (axis, dim, seed, metric), g in df_long.groupby(["axis", "dim", "seed", "metric"]):
+    for (axis, dim, seed, measure), g in df_long.groupby(["axis", "dim", "seed", "measure"]):
         g = g.sort_values("level")
         rho, p = spearmanr(g["level"].to_numpy(), g["value"].to_numpy())
         out.append({"axis": axis, "dim": dim, "seed": seed,
-                    "metric": metric, "rho": float(rho), "p": float(p)})
+                    "measure": measure, "rho": float(rho), "p": float(p)})
     return pd.DataFrame(out)
 
 
 def make_spearman_summary(df_rho):
-    """Aggregate Spearman rho across seeds: mean, std, pass_rate per (axis, dim, metric)."""
+    """Aggregate Spearman rho across seeds: mean, std, pass_rate per (axis, dim, measure)."""
     agg_rows = []
-    for (axis, dim, metric), g in df_rho.groupby(["axis", "dim", "metric"]):
+    for (axis, dim, measure), g in df_rho.groupby(["axis", "dim", "measure"]):
         mean_rho = g["rho"].mean()
         std_rho = g["rho"].std(ddof=1) if len(g) > 1 else 0.0
         if EXPECT_POSITIVE.get(axis) is True:
@@ -502,7 +502,7 @@ def make_spearman_summary(df_rho):
         else:
             pass_rate = float("nan")
         agg_rows.append({
-            "axis": axis, "dim": dim, "metric": metric,
+            "axis": axis, "dim": dim, "measure": measure,
             "rho_mean": float(mean_rho), "rho_std": float(std_rho),
             "pass_rate": float(pass_rate), "n_seeds": int(len(g)),
         })
@@ -518,25 +518,27 @@ def make_spearman_summary(df_rho):
 def main():
     parser = argparse.ArgumentParser(
         description="Build the simulated (Gaussian-mixture) tier and evaluate "
-                    "diversity metrics."
+                    "diversity measures."
     )
     parser.add_argument("--output_dir", type=str, default="./simulated_output",
-                        help="Directory for .npz files and metric CSVs")
-    parser.add_argument("--metrics_dir", type=str, default=None,
-                        help="Directory for metric CSVs (default: output_dir/metrics)")
+                        help="Directory for .npz files and measure CSVs")
+    parser.add_argument("--measures_dir", type=str, default=None,
+                        help="Directory for measure CSVs (default: output_dir/measures)")
     parser.add_argument("--save_datasets", action="store_true",
                         help="Save .npz files for each dataset")
-    parser.add_argument("--run_metrics", action="store_true",
-                        help="Compute all diversity metrics and save CSVs")
+    parser.add_argument("--run_measures", action="store_true",
+                        help="Compute all diversity measures and save CSVs")
 
     parser.add_argument("--n_points", type=int, default=10000,
                         help="Points per dataset (default: 10000, matches the "
                              "per-file count in datasets/natural_text_data/).")
-    parser.add_argument("--dims", type=int, nargs="+", default=[384],
-                        help="Embedding dimensions to sweep over. Default [384] "
-                             "matches sentence-transformers/all-MiniLM-L6-v2, the "
-                             "default semantic embedding model in "
-                             "src/EmbDivBench/axes_registry.py.")
+    parser.add_argument("--dims", type=int, nargs="+",
+                        default=[256, 384, 1024, 2048, 4096],
+                        help="Embedding dimensions to sweep over. Default is the "
+                             "full paper sweep [256, 384, 1024, 2048, 4096]; "
+                             "384 specifically matches sentence-transformers/"
+                             "all-MiniLM-L6-v2 (the default semantic embedding "
+                             "model registered in src/EmbDivBench/axes_registry.py).")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44, 45, 46])
     parser.add_argument("--variety_ks", type=int, nargs="+", default=[10, 20, 30, 40, 50])
     parser.add_argument(
@@ -553,16 +555,16 @@ def main():
         if cond not in BALANCE_CONDITIONS:
             raise ValueError(f"Invalid balance condition: '{cond}'. Valid: {BALANCE_CONDITIONS}")
 
-    # Validate metric dependencies
-    if args.run_metrics:
+    # Validate measure dependencies
+    if args.run_measures:
         if not PANDAS_AVAILABLE:
-            raise ImportError("--run_metrics requires: pip install pandas scipy")
-        _try_import_metrics()
-        if not METRICS_AVAILABLE:
+            raise ImportError("--run_measures requires: pip install pandas scipy")
+        _try_import_measures()
+        if not MEASURES_AVAILABLE:
             raise ImportError(
-                f"--run_metrics requires the EmbDivBench source tree to be "
+                f"--run_measures requires the EmbDivBench source tree to be "
                 f"importable. Run `uv sync` (or `pip install -e .`) from the "
-                f"repo root first. Import failed: {_metric_import_error}"
+                f"repo root first. Import failed: {_measure_import_error}"
             )
 
     # Set up directories
@@ -570,9 +572,9 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
     if args.save_datasets:
         os.makedirs(os.path.join(output_dir, "datasets"), exist_ok=True)
-    metrics_dir = args.metrics_dir or os.path.join(output_dir, "metrics")
-    if args.run_metrics:
-        os.makedirs(metrics_dir, exist_ok=True)
+    measures_dir = args.measures_dir or os.path.join(output_dir, "measures")
+    if args.run_measures:
+        os.makedirs(measures_dir, exist_ok=True)
 
     print("Config:")
     print(f"  dims:               {args.dims}")
@@ -581,7 +583,7 @@ def main():
     print(f"  balance_conditions: {args.balance_conditions}")
     print(f"  disparity_ms:       {args.disparity_ms}")
     print(f"  save_datasets:      {args.save_datasets}")
-    print(f"  run_metrics:        {args.run_metrics}")
+    print(f"  run_measures:        {args.run_measures}")
     print()
 
     all_metric_rows = []
@@ -634,20 +636,20 @@ def main():
                         X=X, y=y,
                     )
 
-            # ── Metrics for this (dim, seed) group ──
-            if args.run_metrics:
-                print(f"\nComputing metrics for dim={dim}, seed={seed} "
+            # ── Measures for this (dim, seed) group ──
+            if args.run_measures:
+                print(f"\nComputing measures for dim={dim}, seed={seed} "
                       f"({len(group_datasets)} datasets)...")
-                rows = run_metrics_on_group(group_datasets)
+                rows = run_measures_on_group(group_datasets)
 
                 # Save per-(dim, seed) CSV immediately (incremental, crash-safe)
                 df_chunk = pd.DataFrame(rows)
-                chunk_path = os.path.join(metrics_dir, f"metrics_dim{dim}_seed{seed}.csv")
+                chunk_path = os.path.join(measures_dir, f"measures_dim{dim}_seed{seed}.csv")
                 df_chunk.to_csv(chunk_path, index=False)
-                print(f"  -> saved metrics_dim{dim}_seed{seed}.csv  shape={df_chunk.shape}")
+                print(f"  -> saved measures_dim{dim}_seed{seed}.csv  shape={df_chunk.shape}")
 
                 df_rho_chunk = spearman_by_seed(df_chunk)
-                rho_path = os.path.join(metrics_dir, f"spearman_dim{dim}_seed{seed}.csv")
+                rho_path = os.path.join(measures_dir, f"spearman_dim{dim}_seed{seed}.csv")
                 df_rho_chunk.to_csv(rho_path, index=False)
                 print(f"  -> saved spearman_dim{dim}_seed{seed}.csv  shape={df_rho_chunk.shape}")
 
@@ -655,29 +657,29 @@ def main():
                 all_rho_rows.append(df_rho_chunk)
 
     # ── Final combined outputs ──
-    if args.run_metrics and all_metric_rows:
+    if args.run_measures and all_metric_rows:
         df_all = pd.DataFrame(all_metric_rows)
-        df_all.to_csv(os.path.join(metrics_dir, "metrics_all.csv"), index=False)
-        print(f"\nSaved metrics_all.csv  shape={df_all.shape}")
+        df_all.to_csv(os.path.join(measures_dir, "measures_all.csv"), index=False)
+        print(f"\nSaved measures_all.csv  shape={df_all.shape}")
 
         df_rho_all = pd.concat(all_rho_rows, ignore_index=True)
-        df_rho_all.to_csv(os.path.join(metrics_dir, "spearman_per_seed.csv"), index=False)
+        df_rho_all.to_csv(os.path.join(measures_dir, "spearman_per_seed.csv"), index=False)
 
         df_summary = make_spearman_summary(df_rho_all)
-        df_summary.to_csv(os.path.join(metrics_dir, "spearman_summary.csv"), index=False)
+        df_summary.to_csv(os.path.join(measures_dir, "spearman_summary.csv"), index=False)
         print(f"Saved spearman_per_seed.csv  shape={df_rho_all.shape}")
         print(f"Saved spearman_summary.csv   shape={df_summary.shape}")
 
-        # Print top-5 metrics per axis
+        # Print top-5 measures per axis
         print("\n--- Spearman summary (top 5 per axis by rho_mean) ---")
         for axis in ["variety", "balance", "disparity"]:
             sub = df_summary[df_summary["axis"] == axis].head(5)
             print(f"\n[{axis}]")
-            print(sub[["dim", "metric", "rho_mean", "rho_std", "pass_rate"]].to_string(index=False))
+            print(sub[["dim", "measure", "rho_mean", "rho_std", "pass_rate"]].to_string(index=False))
 
     print(f"\nDone. All outputs in: {output_dir}")
-    if args.run_metrics:
-        print(f"Metric CSVs in:      {metrics_dir}")
+    if args.run_measures:
+        print(f"Measure CSVs in:      {measures_dir}")
 
 
 if __name__ == "__main__":

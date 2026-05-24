@@ -21,7 +21,7 @@ def dcscore(
         normalize: bool = True,
 ) -> float:
     """
-    Diversity metric based on DCScore (self-similarity with softmax over rows).
+    Diversity measure based on DCScore (self-similarity with softmax over rows).
 
     It follows the logic of `calculate_dcscore_by_embedding` in the original
     DCScore implementation:

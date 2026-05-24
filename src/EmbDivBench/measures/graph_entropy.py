@@ -17,7 +17,7 @@ def graph_entropy(data: TensorLike,
                   metric: DISTANCE_METRIC = "cosine"
                   ) -> float:
     """
-    Computes the graph entropy of a dataset, a metric for structural diversity.
+    Computes the graph entropy of a dataset, a measure for structural diversity.
 
     It constructs a complete weighted graph where vertices correspond to data samples
     and edge weights correspond to pairwise distances.

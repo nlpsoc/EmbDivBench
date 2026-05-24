@@ -21,7 +21,7 @@ def energy(
         **metric_kwargs: Any
 ) -> float:
     """
-    Implements the energy-based diversity metric for a set of vector representations,
+    Implements the energy-based diversity measure for a set of vector representations,
     as described in Velikonivtsev et al., NeurIPS 2024.
     When gamma is set to 1, this  can be interpreted as the average
     pairwise energy for a system of equally charged particles.
@@ -43,7 +43,7 @@ def energy(
         ValueError: If data is empty or contains only one datapoint.
     """
     dists = _compute_pairwise_distances(data, metric, **metric_kwargs)
-    # The metric can blow up when the distance is 0 (e.g., duplicates, or vectors
+    # The measure can blow up when the distance is 0 (e.g., duplicates, or vectors
     # pointing in the same direction). Add a small constant epsilon to
     # entries that are 0 or very small
     dists = np.maximum(dists, epsilon)
