@@ -73,7 +73,11 @@ The default output root is `wiki/output/datasets/wiki/`.
 
 ## Synthetic GMM benchmark
 
-Single script:
+```bash
+bash synthetic/synthetic_umap_vis.sh
+```
+
+or, with finer control:
 
 ```bash
 python synthetic/synthetic_umap_vis.py \
@@ -92,9 +96,9 @@ No GPU required — UMAP on 1 000 points runs in seconds on CPU. The script:
 - optionally evaluates every registered diversity measure and emits per-seed
   Spearman-ρ summary CSVs.
 
-The Slurm wrapper at `synthetic/synthetic_umap_vis.sh` shows the CPU-only
-configuration used in the paper (and again contains the authors' absolute
-paths — feel free to ignore it if you are running locally).
+Like the wiki wrappers, `synthetic/synthetic_umap_vis.sh` resolves all
+paths relative to its own location (`synthetic/output/` by default) and
+can also be submitted via `sbatch`.
 
 ---
 

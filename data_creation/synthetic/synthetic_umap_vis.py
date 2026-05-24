@@ -48,27 +48,22 @@ try:
 except ImportError:
     PANDAS_AVAILABLE = False
 
-# measure_diversity is a project-local package.
-# Set MEASURE_DIVERSITY_SRC to the path of your project's src/ directory,
-# or ensure it is already on PYTHONPATH.
-MEASURE_DIVERSITY_SRC = "/PATH/TO/EmbDivBench/src"  # e.g. "/path/to/Diversity-Measurement/src"
-
+# EmbDivBench is expected to be installed (e.g. `pip install -e .` from the
+# repo root). The import is attempted lazily so the script can still be used
+# for plotting only (without --run_metrics).
 METRICS_AVAILABLE = False
 _metric_import_error = None
 
 
 def _try_import_metrics():
     global METRICS_AVAILABLE, _metric_import_error
-    import sys
-    if MEASURE_DIVERSITY_SRC and MEASURE_DIVERSITY_SRC not in sys.path:
-        sys.path.insert(0, MEASURE_DIVERSITY_SRC)
     try:
-        from measure_diversity import (  # noqa: F401
-            mean_pairwise_distance, distance_dispersion, cluster_inertia_diversity,
-            radius_diversity, graph_entropy, chamfer_distance_diversity,
-            span_with_centroid, span_with_medoid, diameter, bottleneck, energy,
-            vendi_score_diversity, dcscore, log_determinant_diversity, sum_diameter,
-            mst_dispersion, bins_based_entropy_pca, renyi_kernel_entropy, hamdiv,
+        from EmbDivBench import (  # noqa: F401
+            mean_pw_dist, sum_pw_dist, cluster_inertia,
+            radius, graph_entropy, chamfer_dist,
+            span_centroid, span_medoid, diameter, bottleneck, energy,
+            vendi_score, dcscore, log_determinant, sum_diameter,
+            mst_dispersion, bins_entropy, renyi_entropy, hamdiv,
         )
         METRICS_AVAILABLE = True
     except ImportError as e:
@@ -448,12 +443,12 @@ def compute_all_metrics(X, two_d):
     metrics      : dict[str, float | None]
     metric_costs : dict[str, float]  -- wall-clock seconds per metric
     """
-    from measure_diversity import (
-        mean_pairwise_distance, distance_dispersion, cluster_inertia_diversity,
-        radius_diversity, graph_entropy, chamfer_distance_diversity,
-        span_with_centroid, span_with_medoid, diameter, bottleneck, energy,
-        vendi_score_diversity, dcscore, log_determinant_diversity, sum_diameter,
-        mst_dispersion, bins_based_entropy_pca, renyi_kernel_entropy, hamdiv,
+    from EmbDivBench import (
+        mean_pw_dist, sum_pw_dist, cluster_inertia,
+        radius, graph_entropy, chamfer_dist,
+        span_centroid, span_medoid, diameter, bottleneck, energy,
+        vendi_score, dcscore, log_determinant, sum_diameter,
+        mst_dispersion, bins_entropy, renyi_entropy, hamdiv,
     )
 
     data = X.tolist()
@@ -461,26 +456,26 @@ def compute_all_metrics(X, two_d):
     metrics = {}
 
     metric_jobs = [
-        ("mean_pairwise_distance",     lambda: float(mean_pairwise_distance(data))),
-        ("distance_dispersion",        lambda: float(distance_dispersion(data))),
-        ("cluster_inertia_diversity",  lambda: float(cluster_inertia_diversity(data))),
-        ("radius_diversity",           lambda: float(radius_diversity(data))),
-        ("chamfer_distance_diversity", lambda: float(chamfer_distance_diversity(data))),
+        ("mean_pw_dist",     lambda: float(mean_pw_dist(data))),
+        ("sum_pw_dist",        lambda: float(sum_pw_dist(data))),
+        ("cluster_inertia",  lambda: float(cluster_inertia(data))),
+        ("radius",           lambda: float(radius(data))),
+        ("chamfer_dist", lambda: float(chamfer_dist(data))),
         ("convex_hull_volume_2d",      lambda: convex_hull_volume_2d(two_d)),
-        ("span_with_centroid",         lambda: float(span_with_centroid(data))),
-        ("span_with_medoid",           lambda: float(span_with_medoid(data))),
+        ("span_centroid",         lambda: float(span_centroid(data))),
+        ("span_medoid",           lambda: float(span_medoid(data))),
         ("diameter",                   lambda: float(diameter(data))),
         ("sum_diameter",               lambda: float(sum_diameter(data))),
         ("bottleneck",                 lambda: float(bottleneck(data))),
         ("energy",                     lambda: float(energy(data))),
-        ("vendi_score_diversity",      lambda: float(vendi_score_diversity(data))),
-        ("vendi_score_diversity_05",   lambda: float(vendi_score_diversity(data, q=0.5))),
-        ("vendi_score_diversity_15",   lambda: float(vendi_score_diversity(data, q=1.5))),
+        ("vendi_score",      lambda: float(vendi_score(data))),
+        ("vendi_score_diversity_05",   lambda: float(vendi_score(data, q=0.5))),
+        ("vendi_score_diversity_15",   lambda: float(vendi_score(data, q=1.5))),
         ("dcscore",                    lambda: float(dcscore(data))),
-        ("log_determinant_diversity",  lambda: float(log_determinant_diversity(data))),
+        ("log_determinant",  lambda: float(log_determinant(data))),
         ("mst_dispersion",             lambda: float(mst_dispersion(data))),
-        ("bins_based_entropy_pca",     lambda: float(bins_based_entropy_pca(data))),
-        ("renyi_kernel_entropy",       lambda: float(renyi_kernel_entropy(data))),
+        ("bins_entropy",     lambda: float(bins_entropy(data))),
+        ("renyi_entropy",       lambda: float(renyi_entropy(data))),
         ("graph_entropy",              lambda: float(graph_entropy(data))),
         ("hamdiv",                     lambda: float(hamdiv(data))),
     ]
@@ -502,12 +497,12 @@ def compute_all_metrics(X, two_d):
 
 
 METRIC_COLS = [
-    "mean_pairwise_distance", "distance_dispersion", "cluster_inertia_diversity",
-    "radius_diversity", "chamfer_distance_diversity", "convex_hull_volume_2d",
-    "span_with_centroid", "span_with_medoid", "diameter", "sum_diameter",
-    "bottleneck", "energy", "vendi_score_diversity", "vendi_score_diversity_05",
-    "vendi_score_diversity_15", "dcscore", "log_determinant_diversity",
-    "mst_dispersion", "bins_based_entropy_pca", "renyi_kernel_entropy",
+    "mean_pw_dist", "sum_pw_dist", "cluster_inertia",
+    "radius", "chamfer_dist", "convex_hull_volume_2d",
+    "span_centroid", "span_medoid", "diameter", "sum_diameter",
+    "bottleneck", "energy", "vendi_score", "vendi_score_diversity_05",
+    "vendi_score_diversity_15", "dcscore", "log_determinant",
+    "mst_dispersion", "bins_entropy", "renyi_entropy",
     "graph_entropy", "hamdiv",
 ]
 
@@ -601,9 +596,6 @@ def main():
                         help="Skip UMAP plots")
     parser.add_argument("--run_metrics", action="store_true",
                         help="Compute all diversity metrics and save CSVs")
-    parser.add_argument("--metrics_src", type=str, default=None,
-                        help="Path to project src/ dir containing measure_diversity "
-                             "(e.g. /path/to/Diversity-Measurement/src)")
 
     parser.add_argument("--n_points", type=int, default=1000,
                         help="Points per dataset (default: 1000)")
@@ -626,11 +618,6 @@ def main():
         if cond not in BALANCE_CONDITIONS:
             raise ValueError(f"Invalid balance condition: '{cond}'. Valid: {BALANCE_CONDITIONS}")
 
-    # Set metrics src path
-    if args.metrics_src:
-        global MEASURE_DIVERSITY_SRC
-        MEASURE_DIVERSITY_SRC = args.metrics_src
-
     # Validate metric dependencies
     if args.run_metrics:
         if not PANDAS_AVAILABLE:
@@ -638,8 +625,9 @@ def main():
         _try_import_metrics()
         if not METRICS_AVAILABLE:
             raise ImportError(
-                f"--run_metrics requires measure_diversity. Import failed: {_metric_import_error}\n"
-                f"Use --metrics_src /path/to/src to specify the project source directory."
+                f"--run_metrics requires the EmbDivBench package. "
+                f"Install it with `pip install -e .` from the repo root. "
+                f"Import failed: {_metric_import_error}"
             )
 
     if args.no_plots:
