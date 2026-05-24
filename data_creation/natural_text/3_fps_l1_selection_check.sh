@@ -5,9 +5,9 @@
 # Output: fps_l1_selections.json in this directory.
 #
 # Run from any cwd:
-#   bash data_creation/wiki/3_fps_l1_selection_check.sh
+#   bash data_creation/natural_text/3_fps_l1_selection_check.sh
 # or under SLURM:
-#   sbatch data_creation/wiki/3_fps_l1_selection_check.sh
+#   sbatch data_creation/natural_text/3_fps_l1_selection_check.sh
 
 #SBATCH --job-name=fps_l1_selection_check
 #SBATCH --partition=cpu

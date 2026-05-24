@@ -7,7 +7,7 @@ its `.npz` arrays are regenerable from a script.
 
 ## Natural-text tier (`natural_text_data/`)
 
-Built by `data_creation/wiki/4_build_wiki_semdiv_shuffle.py` — see
+Built by `data_creation/natural_text/4_build_natural_text_bench.py` — see
 [`../data_creation/README.md`](../data_creation/README.md) for the
 construction pipeline.
 
@@ -48,13 +48,13 @@ condition)` combinations and exceed practical repository size limits.
 They can be regenerated deterministically by running
 
 ```bash
-bash data_creation/synthetic/synthetic_umap_vis.sh
+bash data_creation/simulated/simulated_gmm.sh
 ```
 
 or, with explicit options,
 
 ```bash
-python data_creation/synthetic/synthetic_umap_vis.py \
+python data_creation/simulated/simulated_gmm.py \
     --output_dir ./datasets/simulated_data \
     --save_datasets \
     --run_metrics

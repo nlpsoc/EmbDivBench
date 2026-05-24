@@ -6,11 +6,11 @@
 # (~30-60 min). Article text itself is fetched live from Wikipedia.
 #
 # Run from any cwd:
-#   bash data_creation/wiki/4_build_wiki_semdiv.sh
+#   bash data_creation/natural_text/4_build_natural_text_bench.sh
 # or under SLURM:
-#   sbatch data_creation/wiki/4_build_wiki_semdiv.sh
+#   sbatch data_creation/natural_text/4_build_natural_text_bench.sh
 
-#SBATCH --job-name=build_wiki_semdiv
+#SBATCH --job-name=build_natural_text_bench
 #SBATCH --partition=cpu
 #SBATCH --time=30:00:00
 #SBATCH --mem=64G
@@ -22,9 +22,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-SCRIPT="${SCRIPT_DIR}/4_build_wiki_semdiv_shuffle.py"
+SCRIPT="${SCRIPT_DIR}/4_build_natural_text_bench.py"
 L2_JSON="${SCRIPT_DIR}/metadata/L2/L2_all.json"
-OUT_BASE="${OUT_BASE:-${SCRIPT_DIR}/output/datasets/wiki}"
+OUT_BASE="${OUT_BASE:-${SCRIPT_DIR}/output/datasets/natural_text}"
 EMB_MODEL="${EMB_MODEL:-Qwen/Qwen3-Embedding-8B}"
 EMB_CACHE="${EMB_CACHE:-${SCRIPT_DIR}/cache/fps_embeddings}"
 
@@ -39,7 +39,7 @@ for SEED in 42 43 44 45 46; do
     --total 10000 \
     --min_direct_pages 30 \
     --max_per_topic 5000 \
-    --cost_json "${OUT_BASE}/seed_${SEED}_/cost_log_wiki_semdiv.json" \
+    --cost_json "${OUT_BASE}/seed_${SEED}_/cost_log_natural_text.json" \
     --min_chars 100 \
     --max_chars 300 \
     --base_depth 1 \

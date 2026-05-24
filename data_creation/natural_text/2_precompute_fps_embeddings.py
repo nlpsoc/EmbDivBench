@@ -10,10 +10,10 @@ the main build script reads from cache on CPU across all 5 seeds.
 Usage (single GPU job, run once before launching the 5-seed CPU job):
 
     python3 precompute_fps_embeddings.py \
-        --l2_json /PATH/TO/wiki_scraper/metadata/L2/L2_all.json \
+        --l2_json /PATH/TO/metadata/L2/L2_all.json \
         --min_direct_pages 30 \
         --model_path /PATH/TO/models/embedding/Qwen3-Embedding-8B \
-        --cache_dir /PATH/TO/wiki_scraper/cache/fps_embeddings \
+        --cache_dir /PATH/TO/cache/fps_embeddings \
         --device cuda --batch_size 32
 
 Idempotent: re-running only computes embeddings for any new names, so it is
@@ -100,7 +100,7 @@ def main() -> None:
     ap.add_argument(
         "--cache_dir",
         type=str,
-        default="/PATH/TO/wiki_scraper/cache/fps_embeddings",
+        default="/PATH/TO/cache/fps_embeddings",
     )
     ap.add_argument("--device", type=str, default=None, help="cuda/cpu; auto-detect if None")
     ap.add_argument("--batch_size", type=int, default=32)

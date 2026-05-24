@@ -5,9 +5,9 @@
 # ~2k labels per seed. GPU recommended; ~1-2 minutes on a single GPU.
 #
 # Run from any cwd:
-#   bash data_creation/wiki/2_precompute_fps_embeddings.sh
+#   bash data_creation/natural_text/2_precompute_fps_embeddings.sh
 # or under SLURM:
-#   sbatch data_creation/wiki/2_precompute_fps_embeddings.sh
+#   sbatch data_creation/natural_text/2_precompute_fps_embeddings.sh
 
 #SBATCH --job-name=precompute_fps_emb
 #SBATCH --partition=gpu

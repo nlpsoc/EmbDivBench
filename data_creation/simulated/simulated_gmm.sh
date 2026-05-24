@@ -1,13 +1,13 @@
 #!/bin/bash
-# Synthetic GMM benchmark + UMAP visualisation + Spearman-rho metric eval.
+# Build the simulated (Gaussian-mixture) tier and evaluate diversity metrics.
 # No GPU required.
 #
 # Run from any cwd:
-#   bash data_creation/synthetic/synthetic_umap_vis.sh
+#   bash data_creation/simulated/simulated_gmm.sh
 # or under SLURM:
-#   sbatch data_creation/synthetic/synthetic_umap_vis.sh
+#   sbatch data_creation/simulated/simulated_gmm.sh
 
-#SBATCH --job-name=umap-vis-metrics
+#SBATCH --job-name=simulated-gmm-metrics
 #SBATCH --partition=cpu
 #SBATCH --time=20:00:00
 #SBATCH --mem=32G
@@ -18,7 +18,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-OUT_DIR="${OUT_DIR:-${SCRIPT_DIR}/output/umap_vis_output}"
+OUT_DIR="${OUT_DIR:-${SCRIPT_DIR}/output/simulated_output}"
 
 mkdir -p "${OUT_DIR}" "${SCRIPT_DIR}/logs"
 
@@ -28,9 +28,9 @@ export CUDA_VISIBLE_DEVICES=""
 
 START_TIME=$(date +%s)
 
-python -u "${SCRIPT_DIR}/synthetic_umap_vis.py" \
+python -u "${SCRIPT_DIR}/simulated_gmm.py" \
   --output_dir "${OUT_DIR}" \
-  --no_plots \
+  --save_datasets \
   --run_metrics
 
 END_TIME=$(date +%s)

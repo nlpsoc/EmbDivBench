@@ -3,13 +3,13 @@
 This directory contains the two pipelines used to build the evaluation
 tiers reported in the paper:
 
-- **`wiki/`** — natural-text tier (Wikipedia data). Builds aligned
+- **`natural_text/`** — natural-text tier (Wikipedia data). Builds aligned
   variety / balance / disparity datasets by running farthest-point sampling
   (FPS) over Qwen3-Embedding-8B representations of Wikipedia L1/L2 category
   labels.
-- **`synthetic/`** — simulated tier (Gaussian-mixture data) plus 3D UMAP
-  visualisation and metric evaluation on a controlled set of variety,
-  balance, and disparity factors.
+- **`simulated/`** — simulated tier (Gaussian-mixture data) plus diversity
+  metric evaluation on a controlled set of variety, balance, and disparity
+  factors.
 
 Both pipelines are runnable on a single machine; the natural-text pipeline
 requires GPU only for step 2 (embedding precomputation). Once the embedding
@@ -23,24 +23,25 @@ Pipeline (run in numerical order):
 
 | Step | Script | Purpose |
 |------|--------|---------|
-| 1 | `wiki/1_inspect_l1_pool.py` | Inspect the viable L1 candidate pool from `L2_all.json`. Optional sweep mode prints how pool size changes across thresholds. |
-| 2 | `wiki/2_precompute_fps_embeddings.py` (`.sh`) | Embed every L1 and L2 label with Qwen3-Embedding-8B and write the cache used by step 4. **GPU recommended.** |
-| 3 | `wiki/3_fps_l1_selection_check.py` (`.sh`) | Diagnostic: verifies that seed-randomised FPS over the L1 embeddings actually yields seed-varied selections. Outputs `fps_l1_selections.json`. |
-| 4 | `wiki/4_build_wiki_semdiv_shuffle.py` (`.sh`) | Build the aligned variety / balance / disparity datasets across 5 seeds. CPU only after step 2. |
+| 1 | `natural_text/1_inspect_l1_pool.py` | Inspect the viable L1 candidate pool from `L2_all.json`. Optional sweep mode prints how pool size changes across thresholds. |
+| 2 | `natural_text/2_precompute_fps_embeddings.py` (`.sh`) | Embed every L1 and L2 label with Qwen3-Embedding-8B and write the cache used by step 4. **GPU recommended.** |
+| 3 | `natural_text/3_fps_l1_selection_check.py` (`.sh`) | Diagnostic: verifies that seed-randomised FPS over the L1 embeddings actually yields seed-varied selections. Outputs `fps_l1_selections.json`. |
+| 4 | `natural_text/4_build_natural_text_bench.py` (`.sh`) | Build the aligned variety / balance / disparity datasets across 5 seeds. CPU only after step 2. |
 
-`wiki/fps_l1_selections.json` is the diagnostic output captured from the
-authors' run of step 3, kept here as a reference for what step 3 should
-produce.
+`natural_text/fps_l1_selections.json` is the diagnostic output captured
+from the authors' run of step 3, kept here as a reference for what step 3
+should produce.
 
 ### Inputs
 
 The Wikipedia category metadata needed by the pipeline ships with the repo:
 
-- `wiki/metadata/L2/L2_all.json` (3.0 MB, 11 554 L2 records) — the catalog
-  of L1/L2 Wikipedia categories with `topic_label`, `category_title`,
-  `direct_pages`, `parent_L1`, etc. produced by a separate scraping pass.
-- `wiki/metadata/L2/viable_l1_min30_min5.txt` — pre-filtered list of L1
-  categories used by step 3.
+- `natural_text/metadata/L2/L2_all.json` (3.0 MB, 11 554 L2 records) — the
+  catalog of L1/L2 Wikipedia categories with `topic_label`,
+  `category_title`, `direct_pages`, `parent_L1`, etc. produced by a
+  separate scraping pass.
+- `natural_text/metadata/L2/viable_l1_min30_min5.txt` — pre-filtered list
+  of L1 categories used by step 3.
 
 The only external resources you need are:
 
@@ -53,9 +54,9 @@ The `.sh` wrappers resolve every path relative to the script location, so
 you can run them from any working directory:
 
 ```bash
-bash wiki/2_precompute_fps_embeddings.sh    # GPU step
-bash wiki/3_fps_l1_selection_check.sh       # diagnostic
-bash wiki/4_build_wiki_semdiv.sh            # main build, CPU
+bash natural_text/2_precompute_fps_embeddings.sh    # GPU step
+bash natural_text/3_fps_l1_selection_check.sh       # diagnostic
+bash natural_text/4_build_natural_text_bench.sh     # main build, CPU
 ```
 
 You can override `EMB_MODEL`, `EMB_CACHE`, `OUT_BASE` via environment
@@ -64,11 +65,11 @@ appropriate `--*` flags.
 
 ### Output
 
-`4_build_wiki_semdiv_shuffle.py` writes JSON datasets for variety
+`4_build_natural_text_bench.py` writes JSON datasets for variety
 (`k = 10/20/30/40/50`), balance (50 topics, varying skew), and disparity
 (`m = 10/20/30/40/50` supporting L1 categories) — 5 seeds per condition.
-The default output root is `wiki/output/datasets/wiki/`. The same 5-seed
-output is also pre-built and bundled at
+The default output root is `natural_text/output/datasets/natural_text/`.
+The same 5-seed output is also pre-built and bundled at
 [`../datasets/natural_text_data/`](../datasets/natural_text_data/), so
 reviewers can skip this step entirely.
 
@@ -77,30 +78,28 @@ reviewers can skip this step entirely.
 ## Simulated tier (Gaussian-mixture data)
 
 ```bash
-bash synthetic/synthetic_umap_vis.sh
+bash simulated/simulated_gmm.sh
 ```
 
 or, with finer control:
 
 ```bash
-python synthetic/synthetic_umap_vis.py \
-    --output_dir ./synthetic_output \
+python simulated/simulated_gmm.py \
+    --output_dir ./simulated_output \
     --save_datasets \
     --run_metrics
 ```
 
-No GPU required — UMAP on 1 000 points runs in seconds on CPU. The script:
+No GPU required. The script:
 
 - generates Gaussian-mixture datasets across five balance regimes (uniform,
   slight head 20/40, mild head 20/60, Zipfian, strong top-1 50%);
-- produces interactive 3D UMAP HTML plots (one per dataset × UMAP-parameter
-  combination);
-- optionally writes the raw datasets as `.npz`;
-- optionally evaluates every registered diversity measure and emits per-seed
-  Spearman-ρ summary CSVs.
+- writes the raw datasets as `.npz` when `--save_datasets` is passed;
+- evaluates every registered diversity measure (when `--run_metrics` is
+  passed) and emits per-seed Spearman-ρ summary CSVs.
 
-Like the wiki wrappers, `synthetic/synthetic_umap_vis.sh` resolves all
-paths relative to its own location (`synthetic/output/` by default) and
+Like the natural-text wrappers, `simulated/simulated_gmm.sh` resolves all
+paths relative to its own location (`simulated/output/` by default) and
 can also be submitted via `sbatch`.
 
 ---

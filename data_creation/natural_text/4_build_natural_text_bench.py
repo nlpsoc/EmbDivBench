@@ -328,7 +328,7 @@ def fps_order(
 
 
 # -----------------------------------------------------------------------------
-# Balance allocations (mirrors synthetic)
+# Balance allocations (mirrors the simulated tier)
 # -----------------------------------------------------------------------------
 BALANCE_CONDITIONS = [
     "uniform",
@@ -972,7 +972,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--embedding_model_path", type=str,
                    default="/PATH/TO/models/embedding/Qwen3-Embedding-8B")
     p.add_argument("--embedding_cache_dir", type=str,
-                   default="/PATH/TO/wiki_scraper/cache/fps_embeddings")
+                   default="/PATH/TO/cache/fps_embeddings")
     p.add_argument("--embedding_device", type=str, default=None,
                    help="cuda / cpu; auto-detected if None")
     p.add_argument("--embedding_batch_size", type=int, default=8)

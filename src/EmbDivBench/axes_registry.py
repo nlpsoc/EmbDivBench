@@ -37,8 +37,11 @@ axes.register(
     "semantic",
     DiversityAxis(
         name="semantic",
-        default_model="all-mpnet-base-v2",
-        alternative_models=["all-MiniLM-L6-v2"],
+        default_model="sentence-transformers/all-MiniLM-L6-v2",
+        alternative_models=[
+            "sentence-transformers/all-mpnet-base-v2",
+            "Qwen/Qwen3-Embedding-8B",
+        ],
         description="Meaning-based diversity using semantic similarity",
     ),
 )

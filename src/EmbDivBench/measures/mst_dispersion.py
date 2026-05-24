@@ -17,6 +17,29 @@ import torch
 def mst_dispersion(data: TensorLike,
                    metric: DISTANCE_METRIC = "cosine"
                    ) -> float:
+    """Compute diversity as the total edge weight of the minimum spanning tree.
+
+    1) Build a complete weighted graph whose edge weights are the pairwise
+       distances between datapoints.
+    2) Run a minimum spanning tree (Kruskal-style via SciPy) on that graph.
+    3) Return the sum of edge weights of the resulting MST.
+
+    Higher values indicate more dispersed (more diverse) data: the MST has
+    to bridge larger gaps to connect every point.
+
+    Args:
+        data: Iterable of vectors (lists/tuples/np.ndarrays/torch.Tensor) of
+            shape (n, d). Must contain at least 2 samples.
+        metric: Distance metric name or callable accepted by
+            ``scipy.spatial.distance.pdist``. Defaults to ``"cosine"``.
+
+    Returns:
+        float: Sum of edge weights of the minimum spanning tree of the
+        complete pairwise-distance graph.
+
+    Raises:
+        ValueError: If ``data`` is not 2D or contains fewer than 2 datapoints.
+    """
     # normalize input to numpy array
     if isinstance(data, torch.Tensor):
         X = data.detach().cpu().numpy()
@@ -28,7 +51,7 @@ def mst_dispersion(data: TensorLike,
 
     n, d = X.shape
     if n < 2:
-        raise ValueError("Cannot compute graph entropy for fewer than 2 datapoints")
+        raise ValueError("Cannot compute mst_dispersion for fewer than 2 datapoints")
 
     # now we create and adjacency matrix with a specified pairwise distance metric
     # by default its cosine distance

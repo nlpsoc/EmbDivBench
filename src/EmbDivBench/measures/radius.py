@@ -27,12 +27,13 @@ def radius(
         data: Iterable of embedding vectors (lists/tuples/np.ndarrays), shape (n, d).
 
     Returns:
-        The geometric mean of standard deviations across all embedding dimensions.
-        Higher values indicate higher dispersion (diversity).
-        Returns 0.0 if fewer than 2 datapoints or zero variance in all dims.
+        The geometric mean of standard deviations across all embedding
+        dimensions. Higher values indicate higher dispersion (diversity).
+        Dimensions with zero variance are clipped to 1e-12 to keep the
+        geometric mean defined, so the returned value is always positive.
 
     Raises:
-        ValueError: If data is empty or contains only one datapoint.
+        ValueError: If data is empty or contains fewer than 2 datapoints.
     """
     X = np.asarray(data, dtype=float)
     n, d = X.shape

@@ -1,18 +1,17 @@
 """
-Generate synthetic GMM datasets, UMAP 3D visualizations, and diversity metric evaluations.
+Generate the simulated (Gaussian-mixture) tier and evaluate diversity metrics.
 
 Usage:
-    python synthetic_umap_vis.py [--output_dir OUTPUT_DIR] [--save_datasets] [--run_metrics]
+    python simulated_gmm.py [--output_dir OUTPUT_DIR] [--save_datasets] [--run_metrics]
 
-No GPU needed. UMAP on 1000 points runs in seconds on CPU.
+No GPU needed.
 
-Dependencies:
-    pip install numpy pandas plotly umap-learn scikit-learn scipy
+Dependencies (already pulled in by ``uv sync`` / ``pip install -e .``):
+    numpy pandas scipy scikit-learn
 
 Output:
-    - HTML files: interactive 3D UMAP plots (one per dataset x UMAP param combo)
-    - .npz files (optional, with --save_datasets): compressed numpy arrays
-    - CSV files (optional, with --run_metrics):
+    - .npz files (with --save_datasets): compressed (X, y) per dataset
+    - CSV files (with --run_metrics):
         metrics_dim{d}_seed{s}.csv  -- per-dataset metric values
         metrics_all.csv             -- combined across all (dim, seed)
         spearman_dim{d}_seed{s}.csv -- per-seed Spearman rho
@@ -29,12 +28,11 @@ Balance conditions (5 levels, ordered from most to least uniform):
 
 import argparse
 import json
-import numpy as np
 import os
 from dataclasses import dataclass
-from itertools import product
-from pathlib import Path
 from time import perf_counter
+
+import numpy as np
 
 # ──────────────────────────────────────────────────────────
 # Optional imports (metrics, pandas, scipy)
@@ -188,7 +186,7 @@ def _make_balance_counts(n_points, k, condition):
 # ──────────────────────────────────────────────────────────
 
 @dataclass
-class SyntheticConfig:
+class SimulatedConfig:
     n_points: int = 1000
     dim: int = 768
     super_scale_coef: float = 5.0   # super-center spread ~ coef * sqrt(dim)
@@ -338,73 +336,7 @@ def make_disparity_dataset(cfg, k_fixed, disparity_m, seed):
 
 
 # ──────────────────────────────────────────────────────────
-# 2. UMAP + Plotly visualization
-# ──────────────────────────────────────────────────────────
-
-def plot_umap_3d(X, y, meta, n_neighbors, min_dist, output_dir):
-    """Run UMAP 3D and save interactive Plotly HTML."""
-    import umap.umap_ as umap
-    import plotly.graph_objects as go
-    import plotly.express as px
-
-    reducer = umap.UMAP(
-        n_components=3,
-        n_neighbors=n_neighbors,
-        min_dist=min_dist,
-        random_state=meta["seed"],
-    )
-    emb_3d = reducer.fit_transform(X)
-
-    fig = go.Figure()
-    labels = np.array(y)
-    unique_labels = np.unique(labels)
-
-    if len(unique_labels) <= 10:
-        colors = px.colors.qualitative.D3
-    elif len(unique_labels) <= 24:
-        colors = px.colors.qualitative.Dark24
-    else:
-        colors = px.colors.sample_colorscale("Turbo", np.linspace(0, 1, len(unique_labels)))
-
-    for i, lab in enumerate(unique_labels):
-        idx = labels == lab
-        fig.add_trace(go.Scatter3d(
-            x=emb_3d[idx, 0], y=emb_3d[idx, 1], z=emb_3d[idx, 2],
-            mode='markers',
-            marker=dict(size=3, opacity=0.7, color=colors[i % len(colors)]),
-            name=f"class {lab}",
-            showlegend=(len(unique_labels) <= 20),
-        ))
-
-    axis = meta["axis"]
-    dim = meta["dim"]
-    seed = meta["seed"]
-    if axis == "variety":
-        level_str = f"k={meta['k']}"
-    elif axis == "balance":
-        level_str = f"cond={meta['balance_condition']}"
-    else:
-        level_str = f"m={meta['disparity_m']}"
-
-    fig.update_layout(
-        title=(
-            f"{axis} | {level_str} | dim={dim} | seed={seed}<br>"
-            f"<span style='font-size:12px'>UMAP(n_neighbors={n_neighbors}, min_dist={min_dist})</span>"
-        ),
-        scene=dict(xaxis_title="UMAP-1", yaxis_title="UMAP-2", zaxis_title="UMAP-3"),
-        width=900, height=700,
-        template="plotly_dark",
-    )
-
-    level_str_safe = level_str.replace("=", "").replace("_", "-")
-    fname = f"{axis}_{level_str_safe}_dim{dim}_seed{seed}_nn{n_neighbors}_md{min_dist}.html"
-    fpath = os.path.join(output_dir, fname)
-    fig.write_html(fpath)
-    print(f"  Saved: {fpath}")
-
-
-# ──────────────────────────────────────────────────────────
-# 3. Metric computation
+# 2. Metric computation
 # ──────────────────────────────────────────────────────────
 
 def reduce_to_2d(embs):
@@ -585,22 +517,26 @@ def make_spearman_summary(df_rho):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Synthetic dataset UMAP visualization + diversity metric evaluation"
+        description="Build the simulated (Gaussian-mixture) tier and evaluate "
+                    "diversity metrics."
     )
-    parser.add_argument("--output_dir", type=str, default="./umap_vis_output",
-                        help="Directory for UMAP HTML and .npz files")
+    parser.add_argument("--output_dir", type=str, default="./simulated_output",
+                        help="Directory for .npz files and metric CSVs")
     parser.add_argument("--metrics_dir", type=str, default=None,
                         help="Directory for metric CSVs (default: output_dir/metrics)")
     parser.add_argument("--save_datasets", action="store_true",
                         help="Save .npz files for each dataset")
-    parser.add_argument("--no_plots", action="store_true",
-                        help="Skip UMAP plots")
     parser.add_argument("--run_metrics", action="store_true",
                         help="Compute all diversity metrics and save CSVs")
 
-    parser.add_argument("--n_points", type=int, default=1000,
-                        help="Points per dataset (default: 1000)")
-    parser.add_argument("--dims", type=int, nargs="+", default=[64, 256, 768, 2048, 4096])
+    parser.add_argument("--n_points", type=int, default=10000,
+                        help="Points per dataset (default: 10000, matches the "
+                             "per-file count in datasets/natural_text_data/).")
+    parser.add_argument("--dims", type=int, nargs="+", default=[384],
+                        help="Embedding dimensions to sweep over. Default [384] "
+                             "matches sentence-transformers/all-MiniLM-L6-v2, the "
+                             "default semantic embedding model in "
+                             "src/EmbDivBench/axes_registry.py.")
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44, 45, 46])
     parser.add_argument("--variety_ks", type=int, nargs="+", default=[10, 20, 30, 40, 50])
     parser.add_argument(
@@ -609,8 +545,6 @@ def main():
              "uniform slight_head20_40 mild_head20_60 zipf strong_top1_50_next4_30",
     )
     parser.add_argument("--disparity_ms", type=int, nargs="+", default=[10, 20, 30, 40, 50])
-    parser.add_argument("--umap_n_neighbors", type=int, nargs="+", default=[15])
-    parser.add_argument("--umap_min_dists", type=float, nargs="+", default=[0.1])
 
     args = parser.parse_args()
 
@@ -631,9 +565,6 @@ def main():
                 f"repo root first. Import failed: {_metric_import_error}"
             )
 
-    if args.no_plots:
-        args.save_datasets = True
-
     # Set up directories
     output_dir = args.output_dir
     os.makedirs(output_dir, exist_ok=True)
@@ -643,16 +574,12 @@ def main():
     if args.run_metrics:
         os.makedirs(metrics_dir, exist_ok=True)
 
-    umap_params = list(product(args.umap_n_neighbors, args.umap_min_dists))
-
     print("Config:")
     print(f"  dims:               {args.dims}")
     print(f"  seeds:              {args.seeds}")
     print(f"  variety_ks:         {args.variety_ks}")
     print(f"  balance_conditions: {args.balance_conditions}")
     print(f"  disparity_ms:       {args.disparity_ms}")
-    if not args.no_plots:
-        print(f"  UMAP params:        {len(umap_params)} combos")
     print(f"  save_datasets:      {args.save_datasets}")
     print(f"  run_metrics:        {args.run_metrics}")
     print()
@@ -661,7 +588,7 @@ def main():
     all_rho_rows = []
 
     for dim in args.dims:
-        cfg = SyntheticConfig(n_points=args.n_points, dim=dim)
+        cfg = SimulatedConfig(n_points=args.n_points, dim=dim)
         for seed in args.seeds:
             print(f"{'='*60}")
             print(f"dim={dim}, seed={seed}")
@@ -680,10 +607,6 @@ def main():
                                      f"variety_k{k}_dim{dim}_seed{seed}.npz"),
                         X=X, y=y,
                     )
-                if not args.no_plots:
-                    for nn, md in umap_params:
-                        plot_umap_3d(X, y, meta, n_neighbors=nn, min_dist=md,
-                                     output_dir=output_dir)
 
             # ── Balance ──
             for cond in args.balance_conditions:
@@ -698,10 +621,6 @@ def main():
                                      f"balance_{cond}_dim{dim}_seed{seed}.npz"),
                         X=X, y=y,
                     )
-                if not args.no_plots:
-                    for nn, md in umap_params:
-                        plot_umap_3d(X, y, meta, n_neighbors=nn, min_dist=md,
-                                     output_dir=output_dir)
 
             # ── Disparity ──
             for m in args.disparity_ms:
@@ -714,10 +633,6 @@ def main():
                                      f"disparity_m{m}_dim{dim}_seed{seed}.npz"),
                         X=X, y=y,
                     )
-                if not args.no_plots:
-                    for nn, md in umap_params:
-                        plot_umap_3d(X, y, meta, n_neighbors=nn, min_dist=md,
-                                     output_dir=output_dir)
 
             # ── Metrics for this (dim, seed) group ──
             if args.run_metrics:

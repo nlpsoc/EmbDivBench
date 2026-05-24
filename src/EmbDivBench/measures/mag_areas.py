@@ -27,10 +27,13 @@ def _load_magnipy():
         from magnipy import Diversipy
     except ImportError as e:
         raise ImportError(
-            "mag_areas needs the 'magarea' optional dependency. "
-            "Install it with: pip install -e \".[magarea]\" --no-deps  "
+            "mag_areas needs magnipy. Install it manually with: "
+            "pip install --no-deps "
+            "\"magnipy @ git+https://github.com/aidos-lab/magnipy.git"
+            "@54cb6a2c64f442b339118d6922339231cdb60a82\" "
+            "&& pip install numexpr seaborn krypy. "
             "(--no-deps is required because magnipy's own pyproject pins "
-            "scipy==1.13.0, which conflicts with EmbDivBench's scipy~=1.16.0)."
+            "scipy==1.13.0, which conflicts with EmbDivBench's scipy>=1.16.0.)"
         ) from e
     return Diversipy
 

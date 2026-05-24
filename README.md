@@ -11,12 +11,12 @@ measurement for text datasets**. It contains:
    [`datasets/README.md`](datasets/README.md) for the file layout.
 3. **`data_creation/`** — the scripts that build the two evaluation tiers
    used in the paper (the natural-text tier in
-   [`data_creation/wiki/`](data_creation/wiki/), and the simulated tier
-    in [`data_creation/synthetic/`](data_creation/synthetic/)).
+   [`data_creation/natural_text/`](data_creation/natural_text/), and the
+   simulated tier in [`data_creation/simulated/`](data_creation/simulated/)).
 
 > The simulated data `.npz` arrays would total ~25 GB and are
 > therefore **not** shipped in this repository. They are deterministic
-> outputs of `data_creation/synthetic/synthetic_umap_vis.py`, which is
+> outputs of `data_creation/simulated/simulated_gmm.py`, which is
 > included so reviewers can regenerate them. See
 > [`datasets/README.md`](datasets/README.md#simulated-tier) for the command.
 
@@ -39,12 +39,12 @@ texts = [
     "It was a sunny afternoon.",
 ]
 
-# Default: graph_entropy on top of the semantic axis (all-mpnet-base-v2)
+# Default: graph_entropy on the semantic axis (all-MiniLM-L6-v2)
 measure_diversity(texts)
 # Use a different diversity axis
 measure_diversity(texts, diversity_axis="style")
-# Use a specific embedding model
-measure_diversity(texts, embedding_model="all-MiniLM-L6-v2")
+# Use a stronger / different embedding model
+measure_diversity(texts, embedding_model="Qwen/Qwen3-Embedding-8B")
 # Run the core set of measures
 measure_diversity(texts, measure="core")
 # Run specific measures
@@ -109,20 +109,23 @@ registry.
 | | Value |
 |---|---|
 | `diversity_axis` | `"semantic"` |
-| `embedding_model` | `sentence-transformers/all-mpnet-base-v2` |
+| `embedding_model` | `sentence-transformers/all-MiniLM-L6-v2` |
 | Single measure | `graph_entropy` |
 | `measure="core"` set | `graph_entropy`, `log_determinant`, `mean_pw_dist`, `vendi_score`, `convex_hull_volume_2d`, `energy` (one representative per family) |
 
-The `"style"` axis uses `AnnaWegmann/Style-Embedding` by default; both
-axis defaults are registered in `src/EmbDivBench/axes_registry.py`.
+Other embedding models can be picked via `embedding_model=...`. The
+`semantic` axis registers `sentence-transformers/all-mpnet-base-v2` and
+`Qwen/Qwen3-Embedding-8B` as alternatives; the `style` axis uses
+`AnnaWegmann/Style-Embedding` by default. Both axis registrations are in
+`src/EmbDivBench/axes_registry.py`.
 
 ## Reproducing the benchmarks
 
 The two evaluation tiers from the paper are constructed by the scripts
 under `data_creation/`:
 
-- **Natural-text tier** (Wikipedia data) — `data_creation/wiki/`
-- **Simulated tier** (Gaussian-mixture data) — `data_creation/synthetic/`
+- **Natural-text tier** (Wikipedia data) — `data_creation/natural_text/`
+- **Simulated tier** (Gaussian-mixture data) — `data_creation/simulated/`
 
 See [`data_creation/README.md`](data_creation/README.md) for the exact
 ordering of scripts, required external inputs (e.g. the L2 Wikipedia category
@@ -148,8 +151,8 @@ from a command-line wrapper (`EmbDivBench --help` after `uv sync`).
 ├── datasets/
 │   └── natural_text_data/  # natural-text tier (5 seeds × 3 axes, Wikipedia)
 ├── data_creation/
-│   ├── wiki/               # natural-text tier construction scripts + L2 metadata
-│   └── synthetic/          # simulated tier construction scripts (data regenerable)
+│   ├── natural_text/       # natural-text tier construction scripts + L2 metadata
+│   └── simulated/          # simulated tier construction scripts (data regenerable)
 ├── pyproject.toml
 ├── uv.lock
 └── LICENSE
