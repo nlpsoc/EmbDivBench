@@ -65,17 +65,21 @@ source .venv/bin/activate
 A plain `pip install -e .` also works if you prefer not to use `uv`; all
 runtime dependencies are listed in `pyproject.toml`.
 
-### Optional extras
+### Optional: `mag_areas`
 
 The `mag_areas` measure depends on
-[`aidos-lab/magnipy`](https://github.com/aidos-lab/magnipy), which pins an
-older scipy. Install it separately:
+[`aidos-lab/magnipy`](https://github.com/aidos-lab/magnipy), which pins
+`scipy==1.13.0` and therefore conflicts with the project's `scipy>=1.16.0`.
+Install it manually after `uv sync`:
 
 ```bash
-pip install -e ".[magarea]" --no-deps
+pip install --no-deps "magnipy @ git+https://github.com/aidos-lab/magnipy.git@54cb6a2c64f442b339118d6922339231cdb60a82"
+pip install numexpr seaborn krypy
 ```
 
-See the comment block in `pyproject.toml` for details.
+At runtime `mag_areas` shims `scipy.integrate.trapz = trapezoid` (removed
+in scipy 1.14) so magnipy imports cleanly on our scipy version. All other
+measures work without this step.
 
 ## Available measures
 
