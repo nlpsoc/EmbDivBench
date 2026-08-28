@@ -59,7 +59,7 @@ def _try_import_measures():
     try:
         from EmbDivBench import (  # noqa: F401
             mean_pw_dist, sum_pw_dist, cluster_inertia,
-            radius, graph_entropy, chamfer_dist,
+            geo_mean_of_std, graph_entropy, chamfer_dist,
             span_centroid, span_medoid, diameter, bottleneck, energy,
             vendi_score, dcscore, log_determinant, sum_diameter,
             mst_dispersion, bins_entropy, renyi_entropy,
@@ -378,7 +378,7 @@ def compute_all_measures(X, two_d):
     """
     from EmbDivBench import (
         mean_pw_dist, sum_pw_dist, cluster_inertia,
-        radius, graph_entropy, chamfer_dist,
+        geo_mean_of_std, graph_entropy, chamfer_dist,
         span_centroid, span_medoid, diameter, bottleneck, energy,
         vendi_score, dcscore, log_determinant, sum_diameter,
         mst_dispersion, bins_entropy, renyi_entropy,
@@ -392,7 +392,7 @@ def compute_all_measures(X, two_d):
         ("mean_pw_dist",     lambda: float(mean_pw_dist(data))),
         ("sum_pw_dist",        lambda: float(sum_pw_dist(data))),
         ("cluster_inertia",  lambda: float(cluster_inertia(data))),
-        ("radius",           lambda: float(radius(data))),
+        ("geo_mean_of_std",  lambda: float(geo_mean_of_std(data))),
         ("chamfer_dist", lambda: float(chamfer_dist(data))),
         ("convex_hull_volume_2d",      lambda: convex_hull_volume_2d(two_d)),
         ("span_centroid",         lambda: float(span_centroid(data))),
@@ -430,7 +430,7 @@ def compute_all_measures(X, two_d):
 
 MEASURE_COLS = [
     "mean_pw_dist", "sum_pw_dist", "cluster_inertia",
-    "radius", "chamfer_dist", "convex_hull_volume_2d",
+    "geo_mean_of_std", "chamfer_dist", "convex_hull_volume_2d",
     "span_centroid", "span_medoid", "diameter", "sum_diameter",
     "bottleneck", "energy", "vendi_score", "vendi_score_diversity_05",
     "vendi_score_diversity_15", "dcscore", "log_determinant",

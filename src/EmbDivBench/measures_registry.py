@@ -17,7 +17,7 @@ from .measures.sum_bottleneck import sum_bottleneck
 # Geometry-based
 from .measures.convex_hull_volume_2d import convex_hull_volume_2d
 from .measures.span_centroid import span_centroid
-from .measures.radius import radius
+from .measures.geo_mean_of_std import geo_mean_of_std
 from .measures.span_medoid import span_medoid
 from .measures.cluster_inertia import cluster_inertia
 from .measures.log_determinant import log_determinant
@@ -50,7 +50,7 @@ measures.register("sum_bottleneck", sum_bottleneck)
 # Geometry-based
 measures.register("convex_hull_volume_2d", convex_hull_volume_2d)
 measures.register("span_centroid", span_centroid)
-measures.register("radius", radius)
+measures.register("geo_mean_of_std", geo_mean_of_std)
 measures.register("span_medoid", span_medoid)
 measures.register("cluster_inertia", cluster_inertia)
 measures.register("log_determinant", log_determinant)

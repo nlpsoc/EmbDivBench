@@ -11,7 +11,7 @@ import numpy as np
 
 
 @accepts_text
-def radius(
+def geo_mean_of_std(
         data: Sequence[Sequence[float]]
 ) -> float:
     """
@@ -39,7 +39,7 @@ def radius(
     n, d = X.shape
 
     if n < 2:
-        raise ValueError("Cannot compute radius diversity for fewer than 2 datapoints")
+        raise ValueError("Cannot compute geo_mean_of_std diversity for fewer than 2 datapoints")
 
     # Standard deviation along each embedding dimension
     stds = np.std(X, axis=0, ddof=1)  # unbiased estimator

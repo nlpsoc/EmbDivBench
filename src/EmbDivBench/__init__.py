@@ -15,7 +15,7 @@ from .measures.sum_bottleneck import sum_bottleneck
 ### Geometry-Based Diversity Measures
 from .measures.convex_hull_volume_2d import convex_hull_volume_2d
 from .measures.span_centroid import span_centroid
-from .measures.radius import radius
+from .measures.geo_mean_of_std import geo_mean_of_std
 from .measures.span_medoid import span_medoid
 from .measures.cluster_inertia import cluster_inertia
 from .measures.log_determinant import log_determinant
@@ -51,7 +51,7 @@ __all__ = [
     # Individual measures
     "mean_pw_dist", "sum_pw_dist", "energy", "chamfer_dist",
     "diameter", "bottleneck", "sum_diameter", "sum_bottleneck",
-    "convex_hull_volume_2d", "span_centroid", "radius",
+    "convex_hull_volume_2d", "span_centroid", "geo_mean_of_std",
     "span_medoid", "cluster_inertia", "log_determinant",
     "graph_entropy", "mst_dispersion",
     "vendi_score", "dcscore", "renyi_entropy",
