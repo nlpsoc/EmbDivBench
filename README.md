@@ -119,6 +119,48 @@ Other embedding models can be picked via `embedding_model=...`. The
 `AnnaWegmann/Style-Embedding` by default. Both axis registrations are in
 `src/EmbDivBench/axes_registry.py`.
 
+### Per-measure hyperparameters
+
+All measures share the same underlying cosine geometry, but differ in the
+matrix they consume: distance-based measures take the cosine *distance*
+matrix, whereas Vendi Score, Rényi Kernel Entropy, DCScore and
+Log-Determinant take the cosine *similarity* (Gram) matrix; for Vendi
+Score, Rényi Kernel Entropy and Log-Determinant this matrix must be
+positive (semi-)definite for their eigenvalue- or determinant-based
+formulations to be well defined. Cluster Inertia inherits squared
+Euclidean distance from K-means, and Geo. Mean of Std., Convex Hull
+Volume and Bins Entropy involve no distance metric at all. "—" means the
+measure takes no further parameters beyond the shared cosine metric. The
+ε terms are numerical stabilizers rather than substantive choices.
+
+| Measure | Hyperparameters |
+|---|---|
+| ***Distance-based*** | |
+| Mean Pairwise Dist. (`mean_pw_dist`) | — |
+| Sum Pairwise Dist. (`sum_pw_dist`) | — |
+| Energy (`energy`) | γ=1.0, ε=1e-12 |
+| Diameter (`diameter`) | — |
+| Bottleneck (`bottleneck`) | — |
+| Sum Diameter (`sum_diameter`) | no division by n |
+| Sum Bottleneck (`sum_bottleneck`) | no division by n |
+| Chamfer Dist. (`chamfer_dist`) | — |
+| ***Geometry-based*** | |
+| Convex Hull Vol. (2D) (`convex_hull_volume_2d`) | 2D UMAP projection, `random_state=42` |
+| Span (Centroid) (`span_centroid`) | 90th percentile |
+| Span (Medoid) (`span_medoid`) | — |
+| Cluster Inertia (`cluster_inertia`) | K=200 |
+| Geo. Mean of Std. (`geo_mean_of_std`) | no distance metric |
+| Log-Determinant (`log_determinant`) | cosine kernel, τ=1.0, normalized, ε=1e-6, Cholesky |
+| ***Distribution-based*** | |
+| Vendi Score (`vendi_score`) | q=1.0, normalized, dual form |
+| Rényi Kernel Ent. (`renyi_entropy`) | α=2.0, cosine kernel, τ=1.0, normalized, ε=1e-12 |
+| DCScore (`dcscore`) | cosine kernel, τ=1.0, normalized |
+| Bins Entropy (UMAP) (`bins_entropy`) | 5×5 grid, UMAP projection, effective normalization |
+| MagArea (`mag_areas`) | n_ts=30 scales |
+| ***Graph-based*** | |
+| MST Dispersion (`mst_dispersion`) | — |
+| Graph Entropy (`graph_entropy`) | — |
+
 ## Reproducing the benchmarks
 
 The two evaluation tiers from the paper are constructed by the scripts
