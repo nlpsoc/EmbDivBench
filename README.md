@@ -93,7 +93,7 @@ four families:
 | Family       | Measures |
 |--------------|----------|
 | Distance     | `mean_pw_dist`, `sum_pw_dist`, `energy`, `chamfer_dist`, `diameter`, `bottleneck`, `sum_diameter`, `sum_bottleneck` |
-| Geometry     | `convex_hull_volume_2d`, `span_centroid`, `radius` (Geo. Mean of Std), `span_medoid`, `cluster_inertia`, `log_determinant` |
+| Geometry     | `convex_hull_volume_2d`, `span_centroid`, `geo_mean_of_std`, `span_medoid`, `cluster_inertia`, `log_determinant` |
 | Graph        | `graph_entropy`, `mst_dispersion` |
 | Distribution | `vendi_score`, `dcscore`, `renyi_entropy`, `bins_entropy`, `mag_areas` |
 
