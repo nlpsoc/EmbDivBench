@@ -27,6 +27,7 @@ Pipeline (run in numerical order):
 | 2 | `natural_text/2_precompute_fps_embeddings.py` (`.sh`) | Embed every L1 and L2 label with Qwen3-Embedding-8B and write the cache used by step 4. **GPU recommended.** |
 | 3 | `natural_text/3_fps_l1_selection_check.py` (`.sh`) | Diagnostic: verifies that seed-randomised FPS over the L1 embeddings actually yields seed-varied selections. Outputs `fps_l1_selections.json`. |
 | 4 | `natural_text/4_build_natural_text_bench.py` (`.sh`) | Build the aligned variety / balance / disparity datasets across 5 seeds. CPU only after step 2. |
+| 5 | `natural_text/5_sample_noise_audit.py` | Optional: sample a blind spreadsheet for a manual audit of the Wikipedia topic labels. |
 
 `natural_text/fps_l1_selections.json` is the diagnostic output captured
 from the authors' run of step 3, kept here as a reference for what step 3
@@ -72,6 +73,30 @@ The default output root is `natural_text/output/datasets/natural_text/`.
 The same 5-seed output is also pre-built and bundled at
 [`../datasets/natural_text_data/`](../datasets/natural_text_data/), so
 reviewers can skip this step entirely.
+
+### Step 5: Manual noise audit (optional)
+
+`natural_text/5_sample_noise_audit.py` draws a small, deterministically
+seeded sample from the labelled tier
+([`../datasets/natural_text_data/labelled/`](../datasets/natural_text_data/labelled/))
+for a blind manual audit of the Wikipedia topic labels: 10 sentences per
+(component, level, seed) across all three axes (variety, balance,
+disparity) — 750 sentences total.
+
+```bash
+python natural_text/5_sample_noise_audit.py
+```
+
+It writes two files to the current working directory:
+
+- `manual_noise_audit_KEY.tsv` — every sampled sentence with its true
+  `wikipedia_topic` label plus metadata (`component`, `level_idx`, `seed`,
+  …).
+- `manual_noise_audit_BLIND.tsv` — the same sentences shuffled and stripped
+  of ground truth, with an empty `your_topic` column and the candidate
+  topic pool for each row, ready to hand to an annotator. Compare the
+  annotator's `your_topic` entries against `manual_noise_audit_KEY.tsv` to
+  estimate the label noise rate.
 
 ---
 
