@@ -7,28 +7,27 @@ from .measures.mean_pw_dist import mean_pw_dist
 from .measures.sum_pw_dist import sum_pw_dist
 from .measures.energy import energy
 from .measures.chamfer_dist import chamfer_dist
+from .measures.diameter import diameter
+from .measures.bottleneck import bottleneck
+from .measures.sum_diameter import sum_diameter
+from .measures.sum_bottleneck import sum_bottleneck
 
 ### Geometry-Based Diversity Measures
 from .measures.convex_hull_volume_2d import convex_hull_volume_2d
 from .measures.span_centroid import span_centroid
 from .measures.radius import radius
-from .measures.diameter import diameter
-from .measures.bottleneck import bottleneck
 from .measures.span_medoid import span_medoid
-from .measures.sum_diameter import sum_diameter
-from .measures.sum_bottleneck import sum_bottleneck
 from .measures.cluster_inertia import cluster_inertia
+from .measures.log_determinant import log_determinant
 
 ### Graph-Based Diversity Measures
 from .measures.graph_entropy import graph_entropy
 from .measures.mst_dispersion import mst_dispersion
-from .measures.hamdiv import hamdiv
 
 ### Distribution-Based Diversity Measures
 from .measures.vendi_score import vendi_score
 from .measures.dcscore import dcscore
 from .measures.renyi_entropy import renyi_entropy
-from .measures.log_determinant import log_determinant
 from .measures.bins_entropy import bins_entropy
 from .measures.mag_areas import mag_areas
 
@@ -51,10 +50,11 @@ __all__ = [
     "measure_diversity",
     # Individual measures
     "mean_pw_dist", "sum_pw_dist", "energy", "chamfer_dist",
-    "convex_hull_volume_2d", "span_centroid", "radius", "diameter", "bottleneck",
-    "span_medoid", "sum_diameter", "sum_bottleneck", "cluster_inertia",
-    "graph_entropy", "mst_dispersion", "hamdiv",
-    "vendi_score", "dcscore", "renyi_entropy", "log_determinant",
+    "diameter", "bottleneck", "sum_diameter", "sum_bottleneck",
+    "convex_hull_volume_2d", "span_centroid", "radius",
+    "span_medoid", "cluster_inertia", "log_determinant",
+    "graph_entropy", "mst_dispersion",
+    "vendi_score", "dcscore", "renyi_entropy",
     "bins_entropy", "mag_areas",
     # Helpers
     "embed_texts",
