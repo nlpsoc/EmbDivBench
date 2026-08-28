@@ -62,7 +62,7 @@ def _try_import_measures():
             radius, graph_entropy, chamfer_dist,
             span_centroid, span_medoid, diameter, bottleneck, energy,
             vendi_score, dcscore, log_determinant, sum_diameter,
-            mst_dispersion, bins_entropy, renyi_entropy, hamdiv,
+            mst_dispersion, bins_entropy, renyi_entropy,
         )
         MEASURES_AVAILABLE = True
     except ImportError as e:
@@ -381,7 +381,7 @@ def compute_all_measures(X, two_d):
         radius, graph_entropy, chamfer_dist,
         span_centroid, span_medoid, diameter, bottleneck, energy,
         vendi_score, dcscore, log_determinant, sum_diameter,
-        mst_dispersion, bins_entropy, renyi_entropy, hamdiv,
+        mst_dispersion, bins_entropy, renyi_entropy,
     )
 
     data = X.tolist()
@@ -410,7 +410,6 @@ def compute_all_measures(X, two_d):
         ("bins_entropy",     lambda: float(bins_entropy(data))),
         ("renyi_entropy",       lambda: float(renyi_entropy(data))),
         ("graph_entropy",              lambda: float(graph_entropy(data))),
-        ("hamdiv",                     lambda: float(hamdiv(data))),
     ]
 
     for measure_name, fn in measure_jobs:
@@ -436,7 +435,7 @@ MEASURE_COLS = [
     "bottleneck", "energy", "vendi_score", "vendi_score_diversity_05",
     "vendi_score_diversity_15", "dcscore", "log_determinant",
     "mst_dispersion", "bins_entropy", "renyi_entropy",
-    "graph_entropy", "hamdiv",
+    "graph_entropy",
 ]
 
 

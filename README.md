@@ -3,7 +3,7 @@
 This repository accompanies the paper **Measuring Data Diversity with
 Embeddings: A Taxonomy and Benchmark for Diversity Measures**. It contains:
 
-1. **`src/EmbDivBench/`** — reference implementations of the 22 diversity
+1. **`src/EmbDivBench/`** — reference implementations of the 21 diversity
    measures (distance-, geometry-, graph-, and distribution-based)
    evaluated in the paper, operating on arbitrary sentence-embedding models.
 2. **`datasets/`** — the natural-text tier (5 seeds × {variety,
@@ -87,15 +87,15 @@ All other measures work without this step.
 
 ## Available measures
 
-All 22 measures live under `src/EmbDivBench/measures/` and are grouped into
+All 21 measures live under `src/EmbDivBench/measures/` and are grouped into
 four families:
 
 | Family       | Measures |
 |--------------|----------|
-| Distance     | `mean_pw_dist`, `sum_pw_dist`, `energy`, `chamfer_dist` |
-| Geometry     | `convex_hull_volume_2d`, `span_centroid`, `radius`, `diameter`, `bottleneck`, `span_medoid`, `sum_diameter`, `sum_bottleneck`, `cluster_inertia` |
-| Graph        | `graph_entropy`, `mst_dispersion`, `hamdiv` |
-| Distribution | `vendi_score`, `dcscore`, `renyi_entropy`, `log_determinant`, `bins_entropy`, `mag_areas` |
+| Distance     | `mean_pw_dist`, `sum_pw_dist`, `energy`, `chamfer_dist`, `diameter`, `bottleneck`, `sum_diameter`, `sum_bottleneck` |
+| Geometry     | `convex_hull_volume_2d`, `span_centroid`, `radius` (Geo. Mean of Std), `span_medoid`, `cluster_inertia`, `log_determinant` |
+| Graph        | `graph_entropy`, `mst_dispersion` |
+| Distribution | `vendi_score`, `dcscore`, `renyi_entropy`, `bins_entropy`, `mag_areas` |
 
 Each single-dataset measure is decorated with `@accepts_text` and
 registered in `src/EmbDivBench/measures_registry.py`, so it can be invoked
