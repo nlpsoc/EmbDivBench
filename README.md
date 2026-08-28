@@ -1,7 +1,7 @@
-# EmbDivBench — Code for EMNLP Submission
+# EmbDivBench
 
-This repository accompanies an EMNLP submission on **embedding-based diversity
-measurement for text datasets**. It contains:
+This repository accompanies the paper **Measuring Data Diversity with
+Embeddings: A Taxonomy and Benchmark for Diversity Measures**. It contains:
 
 1. **`src/EmbDivBench/`** — reference implementations of the 22 diversity
    measures (distance-, geometry-, graph-, and distribution-based)
